@@ -7,7 +7,7 @@
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
-/api/.phpunit
+/api/bin/.phpunit
 /api/phpunit.xml
 ###< symfony/phpunit-bridge ###
 
