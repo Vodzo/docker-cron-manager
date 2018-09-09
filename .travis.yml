@@ -11,7 +11,8 @@ matrix:
         - php bin/phpunit
 
     - language: node_js
-
+      node_js:
+        - "8"
       before_script:
         - cd web
       script:
