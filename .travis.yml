@@ -8,7 +8,7 @@ matrix:
         - cd api
         - composer install
       script:
-        - php bin\phpunit
+        - php bin/phpunit
 
     - language: node_js
 
