@@ -1,7 +1,7 @@
 matrix:
   include:
     - language: php
-      api tests
+
       php:
         - '7.2'
       before_script:
@@ -11,7 +11,7 @@ matrix:
         - php bin\phpunit
 
     - language: node_js
-      web tests
+
       before_script:
         - cd web
       script:
