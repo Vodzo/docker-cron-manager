@@ -1,0 +1,19 @@
+matrix:
+  include:
+    - language: php
+      api tests
+      php:
+        - '7.2'
+      before_script:
+        - cd api
+        - composer install
+      script:
+        - php bin\phpunit
+
+    - language: node_js
+      web tests
+      before_script:
+        - cd web
+      script:
+        - npm i -g yarn
+        - yarn test
