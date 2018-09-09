@@ -17,4 +17,5 @@ matrix:
         - cd web
       script:
         - npm i -g yarn
+        - yarn
         - yarn test
