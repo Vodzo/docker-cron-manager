@@ -2,22 +2,22 @@
     "type": "project",
     "license": "MIT",
     "description": "API For the docker-cron-manager",
-    "minimum-stability": "stable",
     "require": {
         "php": "^7.1.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "jms/serializer-bundle": "^2.4",
+        "nelmio/api-doc-bundle": "^3.3",
         "nelmio/cors-bundle": "^1.5",
-        "symfony/console": "*",
+        "symfony/console": "^4.1",
         "symfony/flex": "^1.1",
         "symfony/framework-bundle": "^4.1",
         "symfony/phpunit-bridge": "^4.1",
-        "symfony/yaml": "*"
+        "symfony/yaml": "^4.1"
     },
     "require-dev": {
-        "symfony/dotenv": "*",
-        "symfony/web-server-bundle": "*"
+        "symfony/dotenv": "^4.1",
+        "symfony/web-server-bundle": "^4.1"
     },
     "config": {
         "preferred-install": {
