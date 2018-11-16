@@ -6,7 +6,7 @@ RUN yarn && yarn build
 FROM php:7.2-fpm-alpine
 RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install pdo_sqlite pdo imap zip mbstring bcmath opcache gd \
+    && docker-php-ext-install pdo imap zip mbstring bcmath opcache gd \
     && apk add autoconf \
         g++ \
         make \
@@ -26,7 +26,7 @@ RUN rm -rf /var/www/* && chown www-data.www-data -R /var/www
 USER www-data    
 
 # install app
-COPY --chown=www-data:www-data ./ /var/www
+COPY --chown=www-data:www-data ./api/ /var/www
 RUN cd /var/www && composer install && composer clearcache \
     && cat /dev/null > /var/www/.env
 
