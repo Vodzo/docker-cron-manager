@@ -9,7 +9,6 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
@@ -114,7 +113,7 @@ class App extends React.Component {
   state = {
     anchorEl: null,
     mobileMoreAnchorEl: null,
-    menuOpen: true,
+    menuOpen: false,
   };
 
   handleProfileMenuOpen = (event) => {
@@ -215,7 +214,6 @@ class App extends React.Component {
           <List>
             {['Inbox', 'Starred', 'Send email', 'Drafts'].map(text => (
               <ListItem button key={text}>
-                <ListItemIcon />
                 <ListItemText primary={text} />
               </ListItem>
             ))}
@@ -224,7 +222,6 @@ class App extends React.Component {
           <List>
             {['All mail', 'Trash', 'Spam'].map(text => (
               <ListItem button key={text}>
-                <ListItemIcon />
                 <ListItemText primary={text} />
               </ListItem>
             ))}
