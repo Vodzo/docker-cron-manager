@@ -61,6 +61,8 @@ COPY --from=builder /home/node/app/build/ /var/www/public/
 # RUN ln -sf /proc/1/fd/1 /var/log/rabbitmq/info.log \
 #     && ln -sf /proc/1/fd/2 /var/log/rabbitmq/error.log
 
+#symlink jobby debug to docker log
+
 ENV APP_ENV=prod
 ENV DATABASE_URL=sqlite:///%kernel.project_dir%/var/data.db
 WORKDIR /var/www
