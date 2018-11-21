@@ -19,6 +19,11 @@ class CronJob
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $schedule;
 
     /**
@@ -130,6 +135,16 @@ class CronJob
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $smtpSenderName;
+    
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $timeCreated;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $timeUpdated;
 
     public function getId(): ?int
     {
@@ -408,6 +423,30 @@ class CronJob
     public function setSmtpSenderName(?string $smtpSenderName): self
     {
         $this->smtpSenderName = $smtpSenderName;
+
+        return $this;
+    }
+    
+    public function getTimeCreated(): ?\DateTimeInterface
+    {
+        return $this->timeCreated;
+    }
+
+    public function setTimeCreated(\DateTimeInterface $timeCreated): self
+    {
+        $this->timeCreated = $timeCreated;
+
+        return $this;
+    }
+
+    public function getTimeUpdated(): ?\DateTimeInterface
+    {
+        return $this->timeUpdated;
+    }
+
+    public function setTimeUpdated(?\DateTimeInterface $timeUpdated): self
+    {
+        $this->timeUpdated = $timeUpdated;
 
         return $this;
     }
