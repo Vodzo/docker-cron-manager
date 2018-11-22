@@ -1,0 +1,20 @@
+# EightPoints GuzzleBundle
+# A full list of configuration options can be found here:
+# https://github.com/8p/EightPointsGuzzleBundle/blob/master/src/Resources/doc/configuration-reference.md
+eight_points_guzzle:
+    clients:
+        default:
+            # Write here the host where to do requests
+            # base_url: "http://target.url"
+
+            # Request options: http://docs.guzzlephp.org/en/stable/request-options.html
+            options:
+                # timeout in seconds
+                timeout: 30
+
+                # set to false to disable throwing exceptions on an HTTP protocol errors (4xx and 5xx responses)
+                http_errors: true
+
+            # Find plugins here:
+            # https://github.com/8p/EightPointsGuzzleBundle#known-and-supported-plugins
+            plugin: ~

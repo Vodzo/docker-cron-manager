@@ -16,3 +16,5 @@
 ###< symfony/web-server-bundle ###
 
 .vscode/
+/api/nbproject
+
