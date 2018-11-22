@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "eightpoints/guzzle-bundle": "^7.4",
         "hellogerard/jobby": "^3.4",
+        "jms/serializer": "^2.0",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/asset": "*",
@@ -27,6 +28,7 @@
         "symfony/yaml": "*"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.0",
         "symfony/debug-pack": "*",
         "symfony/dotenv": "*",
         "symfony/maker-bundle": "^1.0",
