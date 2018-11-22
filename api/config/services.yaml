@@ -29,3 +29,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Service\CronService:
+        class: App\Service\CronService
+        arguments:
+            $jobby: '@Jobby\Jobby'
+
+    Jobby\Jobby:
+        class: Jobby\Jobby
+
+    App\Service\GuzzleService:
+        arguments:
+            $guzzleClient: '@eight_points_guzzle.client.default'
+

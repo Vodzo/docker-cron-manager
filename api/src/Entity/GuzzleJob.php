@@ -46,6 +46,14 @@ class GuzzleJob
      */
     private $timeUpdated;
 
+     /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\CronJob", inversedBy="guzzleJobs")
+     * @ORM\JoinColumn(name="cronJobId", referencedColumnName="id")
+     */
+    private $cronJob;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,4 +130,24 @@ class GuzzleJob
 
         return $this;
     }
+
+    /**
+     * @return CronJob
+     */
+    public function getCronJob(): CronJob
+    {
+        return $this->cronJob;
+    }
+
+    /**
+     * @param CronJob|null $cronJob
+     * @return GuzzleJob
+     */
+    public function setCronJob(?CronJob $cronJob): self
+    {
+        $this->cronJob = $cronJob;
+
+        return $this;
+    }
+
 }
