@@ -12,15 +12,19 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
-import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import MailIcon from '@material-ui/icons/Mail';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
+import Grid from '@material-ui/core/Grid';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import './App.css';
+import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { ApolloProvider, Query } from 'react-apollo';
+import cronstrue from 'cronstrue';
+import Loader from './components/loader';
+import Fab from './components/fab';
+import client from './graphql/client';
+import queryCronJobs from './graphql/query/cronjobs';
 
 const drawerWidth = 240;
 
@@ -95,42 +99,15 @@ const styles = theme => ({
       width: 200,
     },
   },
-  sectionDesktop: {
-    display: 'none',
-    [theme.breakpoints.up('md')]: {
-      display: 'flex',
-    },
-  },
-  sectionMobile: {
-    display: 'flex',
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
+  paper: {
+    width: '100%',
   },
 });
 
 class App extends React.Component {
   state = {
-    anchorEl: null,
-    mobileMoreAnchorEl: null,
     menuOpen: false,
-  };
-
-  handleProfileMenuOpen = (event) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
-    this.handleMobileMenuClose();
-  };
-
-  handleMobileMenuOpen = (event) => {
-    this.setState({ mobileMoreAnchorEl: event.currentTarget });
-  };
-
-  handleMobileMenuClose = () => {
-    this.setState({ mobileMoreAnchorEl: null });
+    search: '',
   };
 
   toggleMenu = () => {
@@ -145,116 +122,107 @@ class App extends React.Component {
     }));
   };
 
+  handleSearch = (e) => {
+    const { value } = e.target;
+    if (this.debounce) {
+      clearTimeout(this.debounce);
+    }
+
+    this.debounce = setTimeout(() => {
+      this.setState(() => ({
+        search: value,
+      }));
+    }, 250);
+  };
+
   render() {
     const { classes } = this.props;
-    const { anchorEl } = this.state;
-    const isMenuOpen = Boolean(anchorEl);
-    const { menuOpen } = this.state;
+    const { menuOpen, search } = this.state;
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar position="fixed" className={classes.appBar}>
-          <Toolbar>
-            <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer">
-              <MenuIcon onClick={this.toggleMenu} />
-            </IconButton>
-            <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-              Material-UI
-            </Typography>
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <SearchIcon />
+      <ApolloProvider client={client}>
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar position="fixed" className={classes.appBar}>
+            <Toolbar>
+              <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer">
+                <MenuIcon onClick={this.toggleMenu} />
+              </IconButton>
+              <Typography className={classes.title} variant="h6" color="inherit" noWrap>
+                DCM - Docker Cron Manager
+              </Typography>
+              <div className={classes.search}>
+                <div className={classes.searchIcon}>
+                  <SearchIcon />
+                </div>
+                <InputBase
+                  placeholder="Search…"
+                  classes={{
+                    root: classes.inputRoot,
+                    input: classes.inputInput,
+                  }}
+                  onChange={this.handleSearch}
+                />
               </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-              />
-            </div>
-            <div className={classes.grow} />
-            <div className={classes.sectionDesktop}>
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                  <MailIcon />
-                </Badge>
-              </IconButton>
-              <IconButton color="inherit">
-                <Badge badgeContent={17} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <IconButton
-                aria-owns={isMenuOpen ? 'material-appbar' : undefined}
-                aria-haspopup="true"
-                onClick={this.handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-            </div>
-            <div className={classes.sectionMobile}>
-              <IconButton aria-haspopup="true" onClick={this.handleMobileMenuOpen} color="inherit">
-                <MoreIcon />
-              </IconButton>
-            </div>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          className={classes.drawer}
-          // variant="permanent"
-          open={menuOpen}
-          onClose={this.handleClose}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-          <div className={classes.toolbar} />
-          <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map(text => (
-              <ListItem button key={text}>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {['All mail', 'Trash', 'Spam'].map(text => (
-              <ListItem button key={text}>
-                <ListItemText primary={text} />
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          <Typography paragraph>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent
-            elementum facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-            hendrerit gravida rutrum quisque non tellus. Convallis convallis tellus id interdum
-            velit laoreet id donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing.
-            Amet nisl suscipit adipiscing bibendum est ultricies integer quis. Cursus euismod quis
-            viverra nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum leo.
-            Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus
-            at augue. At augue eget arcu dictum varius duis at consectetur lorem. Velit sed
-            ullamcorper morbi tincidunt. Lorem donec massa sapien faucibus et molestie ac.
-          </Typography>
-          <Typography paragraph>
-            Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-            facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-            tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-            consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus
-            sed vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in.
-            In hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-            et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique
-            sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo
-            viverra maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam
-            ultrices sagittis orci a.
-          </Typography>
-        </main>
-      </div>
+              <div className={classes.grow} />
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            className={classes.drawer}
+            // variant="permanent"
+            open={menuOpen}
+            onClose={this.handleClose}
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+          >
+            <div className={classes.toolbar} />
+            <List>
+              {['Inbox', 'Starred', 'Send email', 'Drafts'].map(text => (
+                <ListItem button key={text}>
+                  <ListItemText primary={text} />
+                </ListItem>
+              ))}
+            </List>
+            <Divider />
+            <List>
+              {['All mail', 'Trash', 'Spam'].map(text => (
+                <ListItem button key={text}>
+                  <ListItemText primary={text} />
+                </ListItem>
+              ))}
+            </List>
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.toolbar} />
+            CronJobs
+            <Grid container className={classes.root} spacing={16} justify="center">
+              <Grid item xs={null} lg={2} />
+              <Grid item xs={12} lg={8} style={{ textAlign: 'center' }}>
+                <Query query={queryCronJobs} variables={{ search }}>
+                  {({ loading, error, data }) => {
+                    if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
+                    if (error) return `Error! ${error.message}`;
+
+                    return data.cronJobs.edges.length ? data.cronJobs.edges.map(cronJob => (
+                      <ExpansionPanel key={cronJob.node.id}>
+                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography className={classes.heading}>
+                            {cronJob.node.name} - {cronstrue.toString(cronJob.node.schedule)}
+                          </Typography>
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                          <Typography>{cronJob.node.name}</Typography>
+                        </ExpansionPanelDetails>
+                      </ExpansionPanel>
+                    )) : 'No results';
+                  }}
+                </Query>
+              </Grid>
+            </Grid>
+          </main>
+          <Fab />
+        </div>
+      </ApolloProvider>
     );
   }
 }
