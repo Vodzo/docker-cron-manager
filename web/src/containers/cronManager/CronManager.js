@@ -18,7 +18,7 @@ import cronstrue from 'cronstrue';
 import styles from './cronManager.style';
 import queryCronJobs from '../../graphql/query/cronjobs';
 import Fab from '../../components/fab';
-import Editor from '../editor';
+import Editor from '../Editor';
 
 class CronManager extends React.Component {
   static propTypes = {
@@ -30,7 +30,8 @@ class CronManager extends React.Component {
     super(props);
 
     this.state = {
-      editorOpen: false,
+      editorOpen: true,
+      editing: false,
     };
   }
 
@@ -48,7 +49,7 @@ class CronManager extends React.Component {
 
   render() {
     const { classes, search } = this.props;
-    const { editorOpen } = this.state;
+    const { editorOpen, editing } = this.state;
     return (
       <main className={classes.content}>
         <div className={classes.toolbar} />
@@ -85,7 +86,7 @@ class CronManager extends React.Component {
           </Grid>
         </Grid>
         <Fab onClick={this.openNewEditor} />
-        <Editor visible={editorOpen} onClose={this.handleEditorClose} />
+        <Editor visible={editorOpen} onClose={this.handleEditorClose} editing={editing} />
       </main>
     );
   }

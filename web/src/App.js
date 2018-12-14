@@ -4,9 +4,9 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 import { ApolloProvider } from 'react-apollo';
 import client from './graphql/client';
-import Header from './containers/header';
-import Drawer from './containers/drawer';
-import CronManager from './containers/cronManager';
+import Header from './containers/Header';
+import Drawer from './containers/Drawer';
+import CronManager from './containers/CronManager';
 
 class App extends React.Component {
   state = {
@@ -51,6 +51,9 @@ class App extends React.Component {
     const MuiTheme = createMuiTheme({
       palette: {
         type: this.state.theme,
+        primary: {
+          main: this.state.theme === 'light' ? '#3f51b5' : '#3f95df',
+        },
       },
     });
 
