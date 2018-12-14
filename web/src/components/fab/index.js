@@ -17,9 +17,9 @@ class FabStyled extends React.PureComponent {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, ...props } = this.props;
     return (
-      <Fab className={classes.fab} color="primary">
+      <Fab className={classes.fab} color="primary" {...props} >
         <AddIcon />
       </Fab>
     );
