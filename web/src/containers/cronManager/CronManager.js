@@ -30,7 +30,7 @@ class CronManager extends React.Component {
     super(props);
 
     this.state = {
-      editorOpen: true,
+      editorOpen: false,
       editing: false,
     };
   }

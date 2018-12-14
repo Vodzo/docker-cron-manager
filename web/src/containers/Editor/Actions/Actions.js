@@ -9,6 +9,8 @@ import styles from './actions.style';
 class Actions extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
+    toggleGuzzleEditor: PropTypes.func,
+    toggleRabbitMQEditor: PropTypes.func,
   };
 
   constructor(props) {
@@ -34,6 +36,16 @@ class Actions extends React.Component {
     }));
   }
 
+  handleGuzzleJob = () => {
+    this.handleCloseMenu();
+    this.props.toggleGuzzleEditor(true);
+  }
+
+  handleRabbitMQJob = () => {
+    this.handleCloseMenu();
+    this.props.toggleRabbitMQEditor();
+  }
+
   render() {
     const { classes } = this.props;
     const { anchorEl, menuOpen } = this.state;
@@ -55,8 +67,8 @@ class Actions extends React.Component {
           open={menuOpen}
           onClose={this.handleCloseMenu}
         >
-          <MenuItem onClick={this.handleCloseMenu}>Guzzle job</MenuItem>
-          <MenuItem onClick={this.handleCloseMenu}>RabbitMQ job</MenuItem>
+          <MenuItem onClick={this.handleGuzzleJob}>Guzzle job</MenuItem>
+          <MenuItem onClick={this.handleRabbitMQJob}>RabbitMQ job</MenuItem>
         </Menu>
       </Paper>
     );

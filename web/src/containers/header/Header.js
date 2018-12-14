@@ -9,6 +9,8 @@ import {
   InputBase,
   withTheme,
   withStyles,
+  Button,
+  Tooltip,
 } from '@material-ui/core';
 
 import {
@@ -16,6 +18,7 @@ import {
   WbIncandescentOutlined,
   Search as SearchIcon,
   Menu as MenuIcon,
+  ImportContacts,
 } from '@material-ui/icons';
 
 import styles from './header.style';
@@ -70,6 +73,17 @@ class Header extends React.Component {
           <IconButton color="inherit" aria-label="Menu" onClick={this.handleThemeChange}>
             {theme === 'light' ? <WbIncandescentOutlined /> : <WbIncandescent />}
           </IconButton>
+          <Tooltip title="Docs" aria-label="Docs">
+            <Button
+              color="inherit"
+              aria-label="Menu"
+              href="https://vodzo.github.io/docker-cron-manager/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ImportContacts />
+            </Button>
+          </Tooltip>
         </Toolbar>
       </AppBar>
     );

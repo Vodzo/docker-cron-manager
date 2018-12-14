@@ -21,6 +21,7 @@ import {
 } from '@material-ui/core';
 import styles from './editor.style';
 import Actions from './Actions';
+import GuzzleEditor from './GuzzleEditor/GuzzleEditor';
 
 class Editor extends React.Component {
   static propTypes = {
@@ -35,11 +36,15 @@ class Editor extends React.Component {
 
     this.state = {
       advanced: false,
+      openGuzzleEditor: false,
     };
   }
 
   handleClose = () => {
     this.props.onClose();
+    this.setState(() => ({
+      advanced: false,
+    }));
   };
 
   toggleAdvanced = () => {
@@ -48,9 +53,17 @@ class Editor extends React.Component {
     }));
   };
 
+  handleToggleGuzzleEditor = (state) => {
+    this.setState(() => ({
+      openGuzzleEditor: state,
+    }));
+  };
+
+  handleToggleRabbitMQEditor = () => {};
+
   render() {
     const { fullScreen, visible: open, classes } = this.props;
-    const { advanced } = this.state;
+    const { advanced, openGuzzleEditor } = this.state;
     return (
       <Dialog
         fullWidth={true}
@@ -185,7 +198,14 @@ class Editor extends React.Component {
                 </FormControl>
               </ExpansionPanelDetails>
             </ExpansionPanel>
-            <Actions />
+            <Actions
+              toggleGuzzleEditor={this.handleToggleGuzzleEditor}
+              toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
+            />
+            <GuzzleEditor
+              visible={openGuzzleEditor}
+              toggleGuzzleEditor={this.handleToggleGuzzleEditor}
+            />
           </FormControl>
         </DialogContent>
         <DialogActions>
