@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, withStyles } from '@material-ui/core';
+import { Fab, withStyles } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 const styles = () => ({
@@ -11,7 +11,7 @@ const styles = () => ({
   },
 });
 
-class Fab extends React.PureComponent {
+class FabStyled extends React.PureComponent {
   static propTypes = {
     classes: PropTypes.object,
   };
@@ -19,11 +19,11 @@ class Fab extends React.PureComponent {
   render() {
     const { classes } = this.props;
     return (
-      <Button variant="fab" className={classes.fab} color="primary">
+      <Fab className={classes.fab} color="primary">
         <AddIcon />
-      </Button>
+      </Fab>
     );
   }
 }
 
-export default withStyles(styles)(Fab);
+export default withStyles(styles)(FabStyled);

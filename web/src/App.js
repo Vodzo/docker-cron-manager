@@ -25,7 +25,6 @@ import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@m
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { ApolloProvider, Query } from 'react-apollo';
 import cronstrue from 'cronstrue';
-// import Loader from './components/loader';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Fab from './components/fab';
 import client from './graphql/client';
