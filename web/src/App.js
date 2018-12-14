@@ -1,11 +1,9 @@
 import React from 'react';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 import { ApolloProvider } from 'react-apollo';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import client from './graphql/client';
-import Header from './containers/Header';
-import Drawer from './containers/Drawer';
 import CronManager from './containers/CronManager';
 
 class App extends React.Component {
@@ -60,14 +58,24 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={MuiTheme}>
         <ApolloProvider client={client}>
-          <CssBaseline />
-          <Header
-            onMenuIconClick={this.toggleMenu}
-            onSearch={this.handleSearch}
-            onThemeChange={this.handleThemeChange}
-          />
-          <Drawer onClose={this.handleClose} menuOpen={menuOpen} />
-          <CronManager search={search} />
+          <Router>
+            <Switch>
+              <Route
+                path="/"
+                render={props => (
+                  <CronManager
+                    {...props}
+                    search={search}
+                    menuOpen={menuOpen}
+                    handleThemeChange={this.handleThemeChange}
+                    handleSearch={this.handleSearch}
+                    toggleMenu={this.toggleMenu}
+                    handleClose={this.handleClose}
+                  />
+                )}
+              />
+            </Switch>
+          </Router>
         </ApolloProvider>
       </MuiThemeProvider>
     );

@@ -21,6 +21,7 @@ import {
   ImportContacts,
 } from '@material-ui/icons';
 
+import { Link } from 'react-router-dom';
 import styles from './header.style';
 
 class Header extends React.Component {
@@ -53,9 +54,11 @@ class Header extends React.Component {
           <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer">
             <MenuIcon onClick={this.toggleMenu} />
           </IconButton>
-          <Typography className={classes.title} variant="h6" color="inherit" noWrap>
-            DCM - Docker Cron Manager
-          </Typography>
+          <Link to="/" className={classes.title}>
+            <Typography variant="h6" color="inherit" noWrap>
+              DCM - Docker Cron Manager
+            </Typography>
+          </Link>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />

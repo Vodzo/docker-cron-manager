@@ -13,6 +13,8 @@ const styles = theme => ({
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
+    color: theme.palette.common.white,
+    textDecoration: 'none',
   },
   search: {
     position: 'relative',
