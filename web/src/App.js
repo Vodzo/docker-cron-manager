@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  withStyles, withTheme, createMuiTheme, MuiThemeProvider,
+} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -14,6 +16,8 @@ import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
+import WbIncandescent from '@material-ui/icons/WbIncandescent';
+import WbIncandescentOutlined from '@material-ui/icons/WbIncandescentOutlined';
 import Grid from '@material-ui/core/Grid';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import './App.css';
@@ -21,7 +25,8 @@ import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@m
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { ApolloProvider, Query } from 'react-apollo';
 import cronstrue from 'cronstrue';
-import Loader from './components/loader';
+// import Loader from './components/loader';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import Fab from './components/fab';
 import client from './graphql/client';
 import queryCronJobs from './graphql/query/cronjobs';
@@ -108,6 +113,7 @@ class App extends React.Component {
   state = {
     menuOpen: false,
     search: '',
+    theme: 'light',
   };
 
   toggleMenu = () => {
@@ -135,12 +141,25 @@ class App extends React.Component {
     }, 250);
   };
 
+  toggleTheme = () => {
+    this.setState(() => ({
+      theme: this.state.theme === 'light' ? 'dark' : 'light',
+    }));
+  };
+
   render() {
     const { classes } = this.props;
-    const { menuOpen, search } = this.state;
+    const { menuOpen, search, theme } = this.state;
+
+    const MuiTheme = createMuiTheme({
+      palette: {
+        type: this.state.theme,
+      },
+    });
+
     return (
-      <ApolloProvider client={client}>
-        <div className={classes.root}>
+      <MuiThemeProvider theme={MuiTheme}>
+        <ApolloProvider client={client}>
           <CssBaseline />
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
@@ -164,6 +183,9 @@ class App extends React.Component {
                 />
               </div>
               <div className={classes.grow} />
+              <IconButton color="inherit" aria-label="Menu" onClick={this.toggleTheme}>
+                {theme === 'light' ? <WbIncandescentOutlined /> : <WbIncandescent />}
+              </IconButton>
             </Toolbar>
           </AppBar>
           <Drawer
@@ -194,35 +216,42 @@ class App extends React.Component {
           </Drawer>
           <main className={classes.content}>
             <div className={classes.toolbar} />
-            CronJobs
-            <Grid container className={classes.root} spacing={16} justify="center">
+            <Grid container className={classes.root} spacing={16}>
               <Grid item xs={null} lg={2} />
               <Grid item xs={12} lg={8} style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+                  <Typography variant="h6" gutterBottom>
+                    CronJobs
+                  </Typography>
+                </div>
                 <Query query={queryCronJobs} variables={{ search }}>
                   {({ loading, error, data }) => {
-                    if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
+                    // if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
+                    if (loading) return <LinearProgress />;
                     if (error) return `Error! ${error.message}`;
 
-                    return data.cronJobs.edges.length ? data.cronJobs.edges.map(cronJob => (
-                      <ExpansionPanel key={cronJob.node.id}>
-                        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography className={classes.heading}>
-                            {cronJob.node.name} - {cronstrue.toString(cronJob.node.schedule)}
-                          </Typography>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                          <Typography>{cronJob.node.name}</Typography>
-                        </ExpansionPanelDetails>
-                      </ExpansionPanel>
-                    )) : 'No results';
+                    return data.cronJobs.edges.length
+                      ? data.cronJobs.edges.map(cronJob => (
+                          <ExpansionPanel key={cronJob.node.id}>
+                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                              <Typography className={classes.heading}>
+                                {cronJob.node.name} - {cronstrue.toString(cronJob.node.schedule)}
+                              </Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                              <Typography>{cronJob.node.name}</Typography>
+                            </ExpansionPanelDetails>
+                          </ExpansionPanel>
+                      ))
+                      : 'No results';
                   }}
                 </Query>
               </Grid>
             </Grid>
           </main>
           <Fab />
-        </div>
-      </ApolloProvider>
+        </ApolloProvider>
+      </MuiThemeProvider>
     );
   }
 }
@@ -231,4 +260,4 @@ App.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(App);
+export default withStyles(styles)(withTheme()(App));
