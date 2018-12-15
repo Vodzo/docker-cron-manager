@@ -11,6 +11,7 @@ const queryCronJobs = gql`
           guzzleJobs {
             edges {
               node {
+                id
                 name
                 method
                 url
