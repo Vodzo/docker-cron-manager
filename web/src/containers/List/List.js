@@ -13,6 +13,8 @@ import { Query } from 'react-apollo';
 import cronstrue from 'cronstrue';
 import PropTypes from 'prop-types';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Link } from 'react-router-dom';
+import { Edit } from '@material-ui/icons';
 import styles from './list.style';
 import queryCronJobs from '../../graphql/query/cronjobs';
 
@@ -33,7 +35,7 @@ class CronList extends React.Component {
               CronJobs
             </Typography>
           </div>
-          <Query query={queryCronJobs} variables={{ search }}>
+          <Query query={queryCronJobs} variables={{ search }} fetchPolicy="network-only">
             {({ loading, error, data }) => {
               // if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
               if (loading) return <LinearProgress />;
@@ -43,6 +45,9 @@ class CronList extends React.Component {
                 ? data.cronJobs.edges.map(cronJob => (
                     <ExpansionPanel key={cronJob.node.id}>
                       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Link to={`/edit/${cronJob.node._id}`}>
+                          <Edit fontSize='small' className={classes.icon} />
+                        </Link>
                         <Typography className={classes.heading}>
                           {cronJob.node.name} - {cronstrue.toString(cronJob.node.schedule)}
                         </Typography>

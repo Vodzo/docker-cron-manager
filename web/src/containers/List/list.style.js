@@ -5,6 +5,9 @@ const styles = () => ({
   paper: {
     width: '100%',
   },
+  icon: {
+    marginRight: '15px',
+  },
 });
 
 export default styles;

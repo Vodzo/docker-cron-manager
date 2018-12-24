@@ -11,6 +11,8 @@ class Actions extends React.Component {
     classes: PropTypes.object.isRequired,
     toggleGuzzleEditor: PropTypes.func,
     toggleRabbitMQEditor: PropTypes.func,
+    jobs: PropTypes.array,
+    handleDeleteGuzzleJob: PropTypes.func,
   };
 
   constructor(props) {
@@ -34,24 +36,30 @@ class Actions extends React.Component {
     this.setState(() => ({
       menuOpen: false,
     }));
-  }
+  };
 
-  handleGuzzleJob = () => {
+  handleGuzzleJob = (guzzleJob) => {
     this.handleCloseMenu();
-    this.props.toggleGuzzleEditor(true);
-  }
+    this.props.toggleGuzzleEditor(true, guzzleJob);
+  };
 
   handleRabbitMQJob = () => {
     this.handleCloseMenu();
     this.props.toggleRabbitMQEditor();
+  };
+
+  deleteGuzzleJob = (guzzleJob) => {
+    this.props.handleDeleteGuzzleJob(guzzleJob);
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, jobs } = this.props;
     const { anchorEl, menuOpen } = this.state;
     return (
       <Paper elevation={1} className={classes.actions}>
-        <Typography variant="h6" gutterBottom>Actions</Typography>
+        <Typography variant="h6" gutterBottom>
+          Actions
+        </Typography>
         <Chip
           label="Add action"
           onClick={this.handleClick}
@@ -61,15 +69,19 @@ class Actions extends React.Component {
           onDelete={this.handleClick}
           deleteIcon={<AddIcon />}
         />
-        <Menu
-          id="action-menu"
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={this.handleCloseMenu}
-        >
-          <MenuItem onClick={this.handleGuzzleJob}>Guzzle job</MenuItem>
+        <Menu id="action-menu" anchorEl={anchorEl} open={menuOpen} onClose={this.handleCloseMenu}>
+          <MenuItem onClick={() => this.handleGuzzleJob(false)}>Guzzle job</MenuItem>
           <MenuItem onClick={this.handleRabbitMQJob}>RabbitMQ job</MenuItem>
         </Menu>
+        {jobs.map((job, index) => (
+          <Chip
+            label={job.node.name}
+            className={classes.chip}
+            key={index}
+            onClick={() => this.handleGuzzleJob(job.node)}
+            onDelete={() => this.deleteGuzzleJob(job.node)}
+          />
+        ))}
       </Paper>
     );
   }

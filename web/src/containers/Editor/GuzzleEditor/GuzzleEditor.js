@@ -3,13 +3,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
   withMobileDialog,
   withStyles,
+  TextField,
+  FormControl,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
+import { Formik } from 'formik';
 import styles from './guzzleEditor.style';
 
 class GuzzleEditor extends React.Component {
@@ -17,6 +19,8 @@ class GuzzleEditor extends React.Component {
     fullScreen: PropTypes.bool,
     visible: PropTypes.bool,
     toggleGuzzleEditor: PropTypes.func,
+    guzzleJob: PropTypes.object,
+    handleGuzzleJob: PropTypes.func,
   };
 
   handleClose = () => {
@@ -24,7 +28,9 @@ class GuzzleEditor extends React.Component {
   };
 
   render() {
-    const { fullScreen, visible } = this.props;
+    const {
+      fullScreen, visible, guzzleJob, handleGuzzleJob,
+    } = this.props;
     return (
       <Dialog
         fullWidth={true}
@@ -35,15 +41,61 @@ class GuzzleEditor extends React.Component {
         aria-labelledby="responsive-dialog-title"
         scroll="paper"
       >
-        <DialogTitle id="responsive-dialog-title">Guzzle job</DialogTitle>
-        <DialogContent>
-          <DialogContentText>sadasd</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={this.handleClose} color="primary">
-            Save
-          </Button>
-        </DialogActions>
+        <Formik
+          initialValues={guzzleJob}
+          onSubmit={(values) => {
+            handleGuzzleJob(values);
+            this.handleClose();
+            // MyImaginaryRestApiCall(user.id, values).then(
+            //   (updatedUser) => {
+            //     actions.setSubmitting(false);
+            //     updateUser(updatedUser);
+            //     onClose();
+            //   },
+            //   (error) => {
+            //     actions.setSubmitting(false);
+            //     actions.setErrors(transformMyRestApiErrorsToAnObject(error));
+            //     actions.setStatus({ msg: 'Set some arbitrary status or data' });
+            //   },
+            // );
+          }}
+          render={({ values, handleChange, handleSubmit }) => (
+            <React.Fragment>
+              <DialogTitle id="responsive-dialog-title">Guzzle job</DialogTitle>
+              <DialogContent>
+                <FormControl fullWidth={true}>
+                  <TextField
+                    id="name"
+                    label="Name"
+                    margin="normal"
+                    autoFocus={true}
+                    value={values.name}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    id="method"
+                    label="Method"
+                    margin="normal"
+                    value={values.method}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    id="url"
+                    label="Url"
+                    margin="normal"
+                    value={values.url}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleSubmit} color="primary">
+                  Save
+                </Button>
+              </DialogActions>
+            </React.Fragment>
+          )}
+        />
       </Dialog>
     );
   }

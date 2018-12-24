@@ -5,12 +5,14 @@ const queryCronJobs = gql`
     cronJobs(name: $search) {
       edges {
         node {
+          _id
           id
           name
           schedule
           guzzleJobs {
             edges {
               node {
+                _id
                 id
                 name
                 method
