@@ -11,6 +11,7 @@ import {
   withTheme,
 } from '@material-ui/core';
 
+import { Link } from 'react-router-dom';
 import styles from './drawer.style';
 
 class StyledDrawer extends React.Component {
@@ -22,7 +23,7 @@ class StyledDrawer extends React.Component {
 
   handleClose = () => {
     this.props.onClose();
-  }
+  };
 
   render() {
     const { classes, menuOpen } = this.props;
@@ -37,20 +38,13 @@ class StyledDrawer extends React.Component {
       >
         <div className={classes.toolbar} />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map(text => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
+          <Link to="/" onClick={this.handleClose}>
+            <ListItem button key="home">
+              <ListItemText primary="Home" />
             </ListItem>
-          ))}
+          </Link>
         </List>
         <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map(text => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
     );
   }
