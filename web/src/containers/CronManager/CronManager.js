@@ -63,12 +63,6 @@ class CronManager extends React.Component {
           <Link to="/new">
             <Fab />
           </Link>
-          <Link to="/edit/1">
-            <Fab style={{ right: '100px' }} />
-          </Link>
-          <Link to="/edit/2">
-            <Fab style={{ right: '200px' }} />
-          </Link>
           <Editor visible={editorOpen} onClose={this.handleEditorClose} editing={editing} />
         </main>
       </React.Fragment>
