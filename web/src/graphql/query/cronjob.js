@@ -52,7 +52,6 @@ const queryCronJob = gql`
 const mutateCronJob = gql`
   mutation cronJob($input: updateCronJobInput) {
     updateCronJob(input: $input) {
-      _id
       id
       name
       schedule
@@ -83,7 +82,6 @@ const mutateCronJob = gql`
       guzzleJobs {
         edges {
           node {
-            _id
             id
             name
             method
