@@ -96,4 +96,12 @@ const mutateCronJob = gql`
   }
 `;
 
-export { queryCronJob, mutateCronJob };
+const createCronJob = gql`
+  mutation cronJob($input: createCronJobInput) {
+    createCronJob(input: $input) {
+      id
+    }
+  }
+`;
+
+export { queryCronJob, mutateCronJob, createCronJob };

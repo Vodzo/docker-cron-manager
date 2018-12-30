@@ -21,7 +21,7 @@ import {
   ImportContacts,
 } from '@material-ui/icons';
 
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import styles from './header.style';
 
 class Header extends React.Component {
@@ -31,6 +31,7 @@ class Header extends React.Component {
     onMenuIconClick: PropTypes.func,
     onSearch: PropTypes.func,
     onThemeChange: PropTypes.func,
+    history: PropTypes.object,
   };
 
   toggleMenu = () => {
@@ -39,6 +40,7 @@ class Header extends React.Component {
 
   handleSearch = (e) => {
     const { value } = e.target;
+    this.props.history.push('/');
     this.props.onSearch(value);
   };
 
@@ -93,4 +95,4 @@ class Header extends React.Component {
   }
 }
 
-export default withStyles(styles)(withTheme()(Header));
+export default withRouter(withStyles(styles)(withTheme()(Header)));

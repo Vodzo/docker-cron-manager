@@ -509,7 +509,7 @@ class CronJob
      * @param \App\Entity\GuzzleJob $guzzleJob
      * @return Application
      */
-    public function removeApplicationComment(GuzzleJob $guzzleJob) : self
+    public function removeGuzzleJob(GuzzleJob $guzzleJob) : self
     {
         if ($this->guzzleJobs->contains($guzzleJob)) {
             $this->guzzleJobs->removeElement($guzzleJob);

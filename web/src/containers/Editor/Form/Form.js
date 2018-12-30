@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   withStyles,
   Button,
+  DialogActions,
 } from '@material-ui/core';
 import React from 'react';
 import { PropTypes } from 'prop-types';
@@ -21,7 +22,7 @@ import { Formik } from 'formik';
 import Actions from '../Actions/index';
 import GuzzleEditor from '../GuzzleEditor/GuzzleEditor';
 import styles from '../editor.style';
-import { mutateCronJob } from '../../../graphql/query/cronjob';
+import { mutateCronJob, createCronJob } from '../../../graphql/query/cronjob';
 
 class EditorForm extends React.Component {
   static propTypes = {
@@ -53,19 +54,45 @@ class EditorForm extends React.Component {
     };
   }
 
-  handleMutation = (updateCronJob, values) => {
+  handleGuzzleMutations = (guzzleJobs) => {
+    const guzzleJobIds = [];
+    guzzleJobs.forEach((edge) => {
+      const { node } = edge;
+      console.log(node);
+    });
+    return guzzleJobIds;
+  };
+
+  handleMutation = (mutation, values) => {
     const cronJob = values;
     cronJob.clientMutationId = '';
-    updateCronJob({
+
+    const guzzleJobs = this.handleGuzzleMutations(cronJob.guzzleJobs.edges);
+    const data = {
       variables: {
         input: {
-          id: cronJob.id,
           name: cronJob.name,
-          schedule: cronJob.schedule,
+          schedule: cronJob.schedule || '',
           clientMutationId: cronJob.clientMutationId,
+          debug: cronJob.debug || false,
+          enabled: cronJob.enabled || false,
+          output: cronJob.output || '/dev/null',
+          dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
+          mailer: cronJob.mailer || 'sendmail',
+          smtpPort: cronJob.smtpPort || 25,
+          timeCreated:
+            cronJob.timeCreated ||
+            `${new Date().getFullYear()}-${new Date().getMonth() +
+              1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+          guzzleJobs,
         },
       },
-    });
+    };
+
+    if (cronJob.id) {
+      data.variables.input.id = cronJob.id;
+    }
+    mutation(data);
   };
 
   handleToggleGuzzleEditor = (guzzleEditorVisible, guzzleJob) => {
@@ -144,13 +171,14 @@ class EditorForm extends React.Component {
   render() {
     const { classes } = this.props;
     const { cronJob, guzzleEditorVisible, guzzleJob } = this.state;
+    const mutationJob = cronJob.id ? mutateCronJob : createCronJob;
     return (
-      <Mutation mutation={mutateCronJob}>
-        {updateCronJob => (
+      <Mutation mutation={mutationJob}>
+        {mutation => (
           <Formik
             initialValues={cronJob}
             onSubmit={(values) => {
-              this.handleMutation(updateCronJob, values);
+              this.handleMutation(mutation, values);
               // MyImaginaryRestApiCall(user.id, values).then(
               //   (updatedUser) => {
               //     actions.setSubmitting(false);
@@ -176,8 +204,6 @@ class EditorForm extends React.Component {
                 >
                   <Switch value="Enabled" checked />
                 </Tooltip>
-
-                <Button onClick={handleSubmit}>test</Button>
                 <DialogContent>
                   <DialogContentText>
                     <a
@@ -342,6 +368,11 @@ class EditorForm extends React.Component {
                     />
                   </FormControl>
                 </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleSubmit} color="primary" variant="contained">
+                    Save
+                  </Button>
+                </DialogActions>
               </React.Fragment>
             )}
           />
