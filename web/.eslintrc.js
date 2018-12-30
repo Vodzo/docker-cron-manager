@@ -38,6 +38,7 @@ module.exports = {
       'import/extensions': 0,
       'guard-for-in': 0,
       'class-methods-use-this': 0,
+      'no-underscore-dangle': 0,
     },
   };
   

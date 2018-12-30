@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GuzzleJobRepository")
+ * @ApiResource
  */
 class GuzzleJob
 {
@@ -45,6 +47,14 @@ class GuzzleJob
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $timeUpdated;
+
+     /**
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\CronJob", inversedBy="guzzleJobs")
+     * @ORM\JoinColumn(name="cronJobId", referencedColumnName="id")
+     */
+    private $cronJob;
+
 
     public function getId(): ?int
     {
@@ -122,4 +132,24 @@ class GuzzleJob
 
         return $this;
     }
+
+    /**
+     * @return CronJob
+     */
+    public function getCronJob(): CronJob
+    {
+        return $this->cronJob;
+    }
+
+    /**
+     * @param CronJob|null $cronJob
+     * @return GuzzleJob
+     */
+    public function setCronJob(?CronJob $cronJob): self
+    {
+        $this->cronJob = $cronJob;
+
+        return $this;
+    }
+
 }
