@@ -53,6 +53,9 @@ class App extends React.Component {
           main: this.state.theme === 'light' ? '#3f51b5' : '#3f95df',
         },
       },
+      typography: {
+        useNextVariants: true,
+      },
     });
 
     return (

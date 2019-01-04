@@ -12,24 +12,24 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
-import styles from './guzzleEditor.style';
+import styles from './rabbitMQEditor.style';
 
-class GuzzleEditor extends React.Component {
+class RabbitMQEditor extends React.Component {
   static propTypes = {
     fullScreen: PropTypes.bool,
     visible: PropTypes.bool,
-    toggleGuzzleEditor: PropTypes.func,
-    guzzleJob: PropTypes.object,
-    handleGuzzleJob: PropTypes.func,
+    toggleRabbitMQEditor: PropTypes.func,
+    rabbitMQJob: PropTypes.object,
+    handleRabbitMQJob: PropTypes.func,
   };
 
   handleClose = () => {
-    this.props.toggleGuzzleEditor(false);
+    this.props.toggleRabbitMQEditor(false);
   };
 
   render() {
     const {
-      fullScreen, visible, guzzleJob, handleGuzzleJob,
+      fullScreen, visible, rabbitMQJob, handleRabbitMQJob,
     } = this.props;
     return (
       <Dialog
@@ -42,14 +42,14 @@ class GuzzleEditor extends React.Component {
         scroll="paper"
       >
         <Formik
-          initialValues={guzzleJob}
+          initialValues={rabbitMQJob}
           onSubmit={(values) => {
-            handleGuzzleJob(values);
+            handleRabbitMQJob(values);
             this.handleClose();
           }}
           render={({ values, handleChange, handleSubmit }) => (
             <React.Fragment>
-              <DialogTitle id="responsive-dialog-title">Guzzle job</DialogTitle>
+              <DialogTitle id="responsive-dialog-title">RabbitMQ job</DialogTitle>
               <DialogContent>
                 <FormControl fullWidth={true}>
                   <TextField
@@ -89,4 +89,4 @@ class GuzzleEditor extends React.Component {
   }
 }
 
-export default withMobileDialog()(withStyles(styles)(GuzzleEditor));
+export default withMobileDialog()(withStyles(styles)(RabbitMQEditor));

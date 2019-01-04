@@ -1,7 +1,7 @@
-const styles = () => ({
+const styles = theme => ({
   expansion: {
-    border: '0px',
-    boxShadow: 'none',
+    // border: '0px',
+    // boxShadow: 'none',
     '&:before': {
       backgroundColor: 'transparent',
     },
@@ -14,6 +14,17 @@ const styles = () => ({
     position: 'absolute',
     top: '20px',
     right: '20px',
+  },
+  buttonRelative: {
+    position: 'relative',
+  },
+  buttonProgress: {
+    color: theme.palette.secondary.main,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
   },
 });
 

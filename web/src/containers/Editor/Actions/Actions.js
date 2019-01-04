@@ -11,8 +11,9 @@ class Actions extends React.Component {
     classes: PropTypes.object.isRequired,
     toggleGuzzleEditor: PropTypes.func,
     toggleRabbitMQEditor: PropTypes.func,
-    jobs: PropTypes.array,
+    cronJob: PropTypes.object,
     handleDeleteGuzzleJob: PropTypes.func,
+    handleDeleteRabbitMQJob: PropTypes.func,
   };
 
   constructor(props) {
@@ -43,17 +44,21 @@ class Actions extends React.Component {
     this.props.toggleGuzzleEditor(true, guzzleJob);
   };
 
-  handleRabbitMQJob = () => {
+  handleRabbitMQJob = (rabbitMQJob) => {
     this.handleCloseMenu();
-    this.props.toggleRabbitMQEditor();
+    this.props.toggleRabbitMQEditor(true, rabbitMQJob);
   };
 
   deleteGuzzleJob = (guzzleJob) => {
     this.props.handleDeleteGuzzleJob(guzzleJob);
-  }
+  };
+
+  deleteRabbitMQJob = (rabbitMQJob) => {
+    this.props.handleDeleteRabbitMQJob(rabbitMQJob);
+  };
 
   render() {
-    const { classes, jobs } = this.props;
+    const { classes, cronJob } = this.props;
     const { anchorEl, menuOpen } = this.state;
     return (
       <Paper elevation={1} className={classes.actions}>
@@ -73,13 +78,22 @@ class Actions extends React.Component {
           <MenuItem onClick={() => this.handleGuzzleJob(false)}>Guzzle job</MenuItem>
           <MenuItem onClick={this.handleRabbitMQJob}>RabbitMQ job</MenuItem>
         </Menu>
-        {jobs.map((job, index) => (
+        {cronJob.guzzleJobs && cronJob.guzzleJobs.edges.map((job, index) => (
           <Chip
             label={job.node.name}
             className={classes.chip}
             key={index}
             onClick={() => this.handleGuzzleJob(job.node)}
             onDelete={() => this.deleteGuzzleJob(job.node)}
+          />
+        ))}
+        {cronJob.rabbitMQJobs && cronJob.rabbitMQJobs.edges.map((job, index) => (
+          <Chip
+            label={job.node.name}
+            className={classes.chip}
+            key={index}
+            onClick={() => this.handleRabbitMQJob(job.node)}
+            onDelete={() => this.deleteRabbitMQJob(job.node)}
           />
         ))}
       </Paper>
