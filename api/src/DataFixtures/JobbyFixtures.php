@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\Entity\CronJob;
 use App\Entity\GuzzleJob;
+use App\Entity\RabbitMQJob;
 
 class JobbyFixtures extends Fixture
 {
@@ -33,6 +34,16 @@ class JobbyFixtures extends Fixture
         $manager->persist($guzzleJob);
         $cron->addGuzzleJob($guzzleJob);
         $manager->persist($cron);
+
+        $rabbitMQJob = new RabbitMQJob();
+        $rabbitMQJob->setName('test rabbitMq')
+                    ->setHost('localhost')
+                    ->setPort(5681)
+                    ->setUser('guest')
+                    ->setPassword('guest')
+                    ;
+        $manager->persist($rabbitMQJob);
+        $cron->addRabbitMQJob($rabbitMQJob);
         $manager->flush();
     }
 }
