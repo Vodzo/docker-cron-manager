@@ -156,13 +156,19 @@ class CronJob
     /**
      * Guzzle jobs
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\GuzzleJob", mappedBy="cronJob")
+     * @ORM\OneToMany(targetEntity="App\Entity\GuzzleJob", mappedBy="cronJob", orphanRemoval=true)
      */
     private $guzzleJobs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\RabbitMQJob", mappedBy="cronJob", orphanRemoval=true)
+     */
+    private $rabbitMQJobs;
 
     public function __construct()
     {
         $this->guzzleJobs = new ArrayCollection();
+        $this->rabbitMQJobs = new ArrayCollection();
     }
 
 
@@ -516,6 +522,37 @@ class CronJob
 			// set the owning side to null (unless already changed)
             if ($guzzleJob->getCronJob() === $this) {
                 $guzzleJob->setCronJob(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|RabbitMQJob[]
+     */
+    public function getRabbitMQJobs(): Collection
+    {
+        return $this->rabbitMQJobs;
+    }
+
+    public function addRabbitMQJob(RabbitMQJob $rabbitMQJob): self
+    {
+        if (!$this->rabbitMQJobs->contains($rabbitMQJob)) {
+            $this->rabbitMQJobs[] = $rabbitMQJob;
+            $rabbitMQJob->setCronJob($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRabbitMQJob(RabbitMQJob $rabbitMQJob): self
+    {
+        if ($this->rabbitMQJobs->contains($rabbitMQJob)) {
+            $this->rabbitMQJobs->removeElement($rabbitMQJob);
+            // set the owning side to null (unless already changed)
+            if ($rabbitMQJob->getCronJob() === $this) {
+                $rabbitMQJob->setCronJob(null);
             }
         }
 
