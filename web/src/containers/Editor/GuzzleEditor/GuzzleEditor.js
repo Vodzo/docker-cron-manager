@@ -77,8 +77,8 @@ class GuzzleEditor extends React.Component {
                 </FormControl>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleSubmit} color="primary">
-                  Save
+                <Button onClick={handleSubmit} color="primary" variant='contained'>
+                  {guzzleJob.id ? 'Update' : 'Add'}
                 </Button>
               </DialogActions>
             </React.Fragment>

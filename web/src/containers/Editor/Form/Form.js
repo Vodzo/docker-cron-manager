@@ -12,6 +12,7 @@ import {
   Button,
   CircularProgress,
   ExpansionPanelSummary,
+  Snackbar,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React from 'react';
@@ -70,6 +71,7 @@ class EditorForm extends React.Component {
       filteringPanel: false,
       loggingPanel: false,
       mailingPanel: false,
+      saveMessageVisible: false,
     };
   }
 
@@ -127,6 +129,10 @@ class EditorForm extends React.Component {
     const cronJob = values;
     cronJob.clientMutationId = '';
 
+    this.setState(() => ({
+      saveMessageVisible: false,
+    }));
+
     this.handleGuzzleMutations(this.state.cronJob.guzzleJobs.edges).then((guzzleJobs) => {
       const data = {
         variables: {
@@ -153,10 +159,20 @@ class EditorForm extends React.Component {
         data.variables.input.id = cronJob.id;
       }
       mutation(data).then(() => {
-        this.props.history.push('/');
-        this.setState(() => ({
-          submitting: false,
-        }));
+        /**
+         * set states before unmount...
+         */
+        this.setState(
+          () => ({
+            submitting: false,
+          }),
+          () => {
+            /**
+             * ...and then redirect
+             */
+            this.props.history.push('/');
+          },
+        );
       });
     });
   };
@@ -174,6 +190,9 @@ class EditorForm extends React.Component {
     } else {
       this.addToQueue(guzzleJob);
     }
+    this.setState(() => ({
+      saveMessageVisible: true,
+    }));
   };
 
   updateGuzzleJob(guzzleJob) {
@@ -274,244 +293,262 @@ class EditorForm extends React.Component {
       filteringPanel,
       loggingPanel,
       mailingPanel,
+      saveMessageVisible,
     } = this.state;
     const mutationJob = cronJob.id ? mutateCronJob : createCronJob;
     return (
-      <Mutation mutation={mutationJob}>
-        {mutation => (
-          <Formik
-            initialValues={cronJob}
-            onSubmit={(values) => {
-              this.setState(() => ({
-                submitting: true,
-              }));
-              this.handleMutation(mutation, values);
-            }}
-            render={({ values, handleChange, handleSubmit }) => (
-              <React.Fragment>
-                {/* <DialogTitle id="responsive-dialog-title"> */}
-                <Typography variant="h4" gutterBottom>
-                  {values.id ? `Edit job: ${values.name}` : 'Create job'}
-                  <Typography variant="caption">
-                    <a
-                      href="https://github.com/jobbyphp/jobby"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      Read Jobby docs
-                    </a>
+      <React.Fragment>
+        <Mutation mutation={mutationJob}>
+          {mutation => (
+            <Formik
+              initialValues={cronJob}
+              onSubmit={(values) => {
+                this.setState(() => ({
+                  submitting: true,
+                }));
+                this.handleMutation(mutation, values);
+              }}
+              render={({ values, handleChange, handleSubmit }) => (
+                <React.Fragment>
+                  {/* <DialogTitle id="responsive-dialog-title"> */}
+                  <Typography variant="h4" gutterBottom>
+                    {values.id ? `Edit job: ${values.name}` : 'Create job'}
+                    <Typography variant="caption">
+                      <a
+                        href="https://github.com/jobbyphp/jobby"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        Read Jobby docs
+                      </a>
+                    </Typography>
                   </Typography>
-                </Typography>
-                {/* </DialogTitle> */}
-                <Tooltip
-                  title="Enable/Disable job"
-                  aria-label="Add"
-                  className={classes.enabledSwitch}
-                >
-                  <Switch value="Enabled" checked />
-                </Tooltip>
+                  {/* </DialogTitle> */}
+                  <Tooltip
+                    title="Enable/Disable job"
+                    aria-label="Add"
+                    className={classes.enabledSwitch}
+                  >
+                    <Switch value="Enabled" checked />
+                  </Tooltip>
 
-                <FormControl fullWidth={true}>
-                  <TextField
-                    id="name"
-                    label="Name"
-                    margin="normal"
-                    autoFocus={true}
-                    value={values.name}
-                    onChange={handleChange}
-                  />
-                  <TextField
-                    id="schedule"
-                    label="Schedule"
-                    margin="normal"
-                    value={values.schedule}
-                    onChange={handleChange}
-                  />
-                  <ExpansionPanel
-                    expanded={filteringPanel}
-                    className={classes.expansion}
-                    onChange={this.toggleFilteringPanel}
-                    style={{ marginTop: '25px' }}
+                  <FormControl fullWidth={true}>
+                    <TextField
+                      id="name"
+                      label="Name"
+                      margin="normal"
+                      autoFocus={true}
+                      value={values.name}
+                      onChange={handleChange}
+                    />
+                    <TextField
+                      id="schedule"
+                      label="Schedule"
+                      margin="normal"
+                      value={values.schedule}
+                      onChange={handleChange}
+                    />
+                    <ExpansionPanel
+                      expanded={filteringPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleFilteringPanel}
+                      style={{ marginTop: '25px' }}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Filtering</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormControl fullWidth={true}>
+                          <TextField id="runAs" label="runAs" margin="normal" />
+                          <FormHelperText>
+                            Run as this user, if crontab user has sudo privileges
+                          </FormHelperText>
+                          <FormControlLabel control={<Switch value="debug" />} label="Debug" />
+                          <FormHelperText>Send jobby internal messages to debug.log</FormHelperText>
+                          <TextField id="Environment" label="Environment" margin="normal" />
+                          <FormHelperText>Development environment for this job</FormHelperText>
+                          <TextField id="runOnHost" label="runOnHost" margin="normal" />
+                          <FormHelperText>Run jobs only on this hostname</FormHelperText>
+                          <TextField
+                            id="maxRuntime"
+                            label="maxRuntime"
+                            margin="normal"
+                            type="number"
+                            placeholder="0"
+                          />
+                          <FormHelperText>
+                            Maximum execution time for this job (in seconds)
+                          </FormHelperText>
+                        </FormControl>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel
+                      expanded={loggingPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleLoggingPanel}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Logging</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormControl fullWidth={true}>
+                          <TextField id="output" label="Output" placeholder="/dev/null" />
+                          <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
+                          <TextField
+                            id="output_stdout"
+                            label="Output stdout"
+                            margin="normal"
+                            placeholder="/dev/null"
+                          />
+                          <FormHelperText>Redirect stdout to this file</FormHelperText>
+                          <TextField
+                            id="output_stderr"
+                            label="Output stderr"
+                            margin="normal"
+                            placeholder="/dev/null"
+                          />
+                          <FormHelperText>Redirect stderr to this filee</FormHelperText>
+                          <TextField
+                            id="dateFormat"
+                            label="DateFormat"
+                            margin="normal"
+                            placeholder="Y-m-d H:i:s"
+                          />
+                          <FormHelperText>Format for dates on jobby log messages</FormHelperText>
+                        </FormControl>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel
+                      expanded={mailingPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleMailingPanel}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Mailing</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormControl fullWidth={true}>
+                          <TextField id="recipients" label="Recipients" placeholder="" />
+                          <FormHelperText>Comma-separated string of email addresses</FormHelperText>
+                          <TextField
+                            id="mailer"
+                            label="Mailer"
+                            margin="normal"
+                            placeholder="sendmail"
+                          />
+                          <FormHelperText>Email method: sendmail or smtp or mail</FormHelperText>
+                          <TextField
+                            id="smtpHost"
+                            label="SMTP Host"
+                            margin="normal"
+                            placeholder="null"
+                          />
+                          <FormHelperText>SMTP host, if mailer is smtp</FormHelperText>
+                          <TextField
+                            id="smtpPort"
+                            label="SMTP Port"
+                            margin="normal"
+                            placeholder="25"
+                            type="number"
+                          />
+                          <FormHelperText>SMTP port, if mailer is smtp</FormHelperText>
+                          <TextField
+                            id="smtpUsername"
+                            label="SMTP Username"
+                            margin="normal"
+                            placeholder=""
+                            type="number"
+                          />
+                          <FormHelperText>SMTP user, if mailer is smtp</FormHelperText>
+                          <TextField
+                            id="smtpPassword"
+                            label="SMTP Password"
+                            margin="normal"
+                            placeholder=""
+                          />
+                          <FormHelperText>SMTP user, if mailer is smtp</FormHelperText>
+                          <TextField
+                            id="smtpSecurity"
+                            label="SMTP Security"
+                            margin="normal"
+                            placeholder=""
+                          />
+                          <FormHelperText>
+                            SMTP security option: ssl or tls, if mailer is smtp
+                          </FormHelperText>
+                          <TextField
+                            id="smtpSender"
+                            label="SMTP Sender"
+                            margin="normal"
+                            placeholder="jobby@<hostname>"
+                          />
+                          <FormHelperText>
+                            The sender and from addresses used in SMTP notices
+                          </FormHelperText>
+                          <TextField
+                            id="smtpSenderName"
+                            label="SMTP Sender name"
+                            margin="normal"
+                            placeholder="Jobby"
+                          />
+                          <FormHelperText>
+                            The name used in the from field for SMTP messages
+                          </FormHelperText>
+                        </FormControl>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <Actions
+                      toggleGuzzleEditor={this.handleToggleGuzzleEditor}
+                      toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
+                      cronJob={cronJob}
+                      handleDeleteGuzzleJob={this.handleDeleteGuzzleJob}
+                      handleDeleteRabbitMQJob={this.handleDeleteRabbitMQJob}
+                    />
+                    <GuzzleEditor
+                      visible={guzzleEditorVisible}
+                      toggleGuzzleEditor={this.handleToggleGuzzleEditor}
+                      guzzleJob={guzzleJob}
+                      handleGuzzleJob={this.handleGuzzleJob}
+                    />
+                    <RabbitMQEditor
+                      visible={rabbitMQEditorVisible}
+                      toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
+                      rabbitMQJob={rabbitMQJob}
+                      handleRabbitMQJob={this.handleRabbitMQJob}
+                    />
+                  </FormControl>
+                  <Button
+                    onClick={handleSubmit}
+                    color="primary"
+                    variant="contained"
+                    className={classes.buttonRelative}
+                    disabled={submitting}
+                    fullWidth
                   >
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="h6">Filtering</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <FormControl fullWidth={true}>
-                        <TextField id="runAs" label="runAs" margin="normal" />
-                        <FormHelperText>
-                          Run as this user, if crontab user has sudo privileges
-                        </FormHelperText>
-                        <FormControlLabel control={<Switch value="debug" />} label="Debug" />
-                        <FormHelperText>Send jobby internal messages to debug.log</FormHelperText>
-                        <TextField id="Environment" label="Environment" margin="normal" />
-                        <FormHelperText>Development environment for this job</FormHelperText>
-                        <TextField id="runOnHost" label="runOnHost" margin="normal" />
-                        <FormHelperText>Run jobs only on this hostname</FormHelperText>
-                        <TextField
-                          id="maxRuntime"
-                          label="maxRuntime"
-                          margin="normal"
-                          type="number"
-                          placeholder="0"
-                        />
-                        <FormHelperText>
-                          Maximum execution time for this job (in seconds)
-                        </FormHelperText>
-                      </FormControl>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                  <ExpansionPanel
-                    expanded={loggingPanel}
-                    className={classes.expansion}
-                    onChange={this.toggleLoggingPanel}
-                  >
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="h6">Logging</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <FormControl fullWidth={true}>
-                        <TextField id="output" label="Output" placeholder="/dev/null" />
-                        <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
-                        <TextField
-                          id="output_stdout"
-                          label="Output stdout"
-                          margin="normal"
-                          placeholder="/dev/null"
-                        />
-                        <FormHelperText>Redirect stdout to this file</FormHelperText>
-                        <TextField
-                          id="output_stderr"
-                          label="Output stderr"
-                          margin="normal"
-                          placeholder="/dev/null"
-                        />
-                        <FormHelperText>Redirect stderr to this filee</FormHelperText>
-                        <TextField
-                          id="dateFormat"
-                          label="DateFormat"
-                          margin="normal"
-                          placeholder="Y-m-d H:i:s"
-                        />
-                        <FormHelperText>Format for dates on jobby log messages</FormHelperText>
-                      </FormControl>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                  <ExpansionPanel
-                    expanded={mailingPanel}
-                    className={classes.expansion}
-                    onChange={this.toggleMailingPanel}
-                  >
-                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography variant="h6">Mailing</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                      <FormControl fullWidth={true}>
-                        <TextField id="recipients" label="Recipients" placeholder="" />
-                        <FormHelperText>Comma-separated string of email addresses</FormHelperText>
-                        <TextField
-                          id="mailer"
-                          label="Mailer"
-                          margin="normal"
-                          placeholder="sendmail"
-                        />
-                        <FormHelperText>Email method: sendmail or smtp or mail</FormHelperText>
-                        <TextField
-                          id="smtpHost"
-                          label="SMTP Host"
-                          margin="normal"
-                          placeholder="null"
-                        />
-                        <FormHelperText>SMTP host, if mailer is smtp</FormHelperText>
-                        <TextField
-                          id="smtpPort"
-                          label="SMTP Port"
-                          margin="normal"
-                          placeholder="25"
-                          type="number"
-                        />
-                        <FormHelperText>SMTP port, if mailer is smtp</FormHelperText>
-                        <TextField
-                          id="smtpUsername"
-                          label="SMTP Username"
-                          margin="normal"
-                          placeholder=""
-                          type="number"
-                        />
-                        <FormHelperText>SMTP user, if mailer is smtp</FormHelperText>
-                        <TextField
-                          id="smtpPassword"
-                          label="SMTP Password"
-                          margin="normal"
-                          placeholder=""
-                        />
-                        <FormHelperText>SMTP user, if mailer is smtp</FormHelperText>
-                        <TextField
-                          id="smtpSecurity"
-                          label="SMTP Security"
-                          margin="normal"
-                          placeholder=""
-                        />
-                        <FormHelperText>
-                          SMTP security option: ssl or tls, if mailer is smtp
-                        </FormHelperText>
-                        <TextField
-                          id="smtpSender"
-                          label="SMTP Sender"
-                          margin="normal"
-                          placeholder="jobby@<hostname>"
-                        />
-                        <FormHelperText>
-                          The sender and from addresses used in SMTP notices
-                        </FormHelperText>
-                        <TextField
-                          id="smtpSenderName"
-                          label="SMTP Sender name"
-                          margin="normal"
-                          placeholder="Jobby"
-                        />
-                        <FormHelperText>
-                          The name used in the from field for SMTP messages
-                        </FormHelperText>
-                      </FormControl>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
-                  <Actions
-                    toggleGuzzleEditor={this.handleToggleGuzzleEditor}
-                    toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
-                    cronJob={cronJob}
-                    handleDeleteGuzzleJob={this.handleDeleteGuzzleJob}
-                    handleDeleteRabbitMQJob={this.handleDeleteRabbitMQJob}
-                  />
-                  <GuzzleEditor
-                    visible={guzzleEditorVisible}
-                    toggleGuzzleEditor={this.handleToggleGuzzleEditor}
-                    guzzleJob={guzzleJob}
-                    handleGuzzleJob={this.handleGuzzleJob}
-                  />
-                  <RabbitMQEditor
-                    visible={rabbitMQEditorVisible}
-                    toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
-                    rabbitMQJob={rabbitMQJob}
-                    handleRabbitMQJob={this.handleRabbitMQJob}
-                  />
-                </FormControl>
-                <Button
-                  onClick={handleSubmit}
-                  color="primary"
-                  variant="contained"
-                  className={classes.buttonRelative}
-                  disabled={submitting}
-                  fullWidth
-                >
-                  Save
-                  {submitting && <CircularProgress size={24} className={classes.buttonProgress} />}
-                </Button>
-              </React.Fragment>
-            )}
-          />
-        )}
-      </Mutation>
+                    Save
+                    {submitting && (
+                      <CircularProgress size={24} className={classes.buttonProgress} />
+                    )}
+                  </Button>
+                </React.Fragment>
+              )}
+            />
+          )}
+        </Mutation>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={saveMessageVisible}
+          autoHideDuration={5000}
+          onClose={this.handleClose}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">To apply changes click save</span>}
+        />
+      </React.Fragment>
     );
   }
 }
