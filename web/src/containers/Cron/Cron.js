@@ -32,7 +32,7 @@ class Cron extends React.Component {
               // if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
               if (loading) return <LinearProgress />;
               if (error) return `Error! ${error.message}`;
-
+              if (!data.cronJob) return 'Error! Not found';
               return <Form cronJob={data.cronJob} />;
             }}
           </Query>
