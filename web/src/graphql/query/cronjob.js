@@ -31,6 +31,19 @@ const queryCronJob = gql`
       smtpSenderName
       timeCreated
       timeUpdated
+      rabbitMQJobs {
+        edges {
+          node {
+            id
+            name
+            host
+            port
+            user
+            password
+            vhost
+          }
+        }
+      }
       guzzleJobs {
         edges {
           node {
