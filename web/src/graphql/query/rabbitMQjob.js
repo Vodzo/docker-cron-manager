@@ -17,6 +17,14 @@ const rabbitMQJobFragment = gql`
     queueAutoDelete
     queueNoWait
     queueTicket
+    exchangeName
+    exchangeType
+    exchangePassive
+    exchangeDurable
+    exchangeAutoDelete
+    exchangeInternal
+    exchangeNoWait
+    exchangeTicket
   }
 `;
 
