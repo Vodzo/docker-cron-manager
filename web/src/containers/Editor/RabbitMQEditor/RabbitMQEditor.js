@@ -9,6 +9,9 @@ import {
   withStyles,
   TextField,
   FormControl,
+  Typography,
+  FormControlLabel,
+  Switch,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
@@ -61,17 +64,110 @@ class RabbitMQEditor extends React.Component {
                     onChange={handleChange}
                   />
                   <TextField
-                    id="method"
-                    label="Method"
+                    id="host"
+                    label="Host"
                     margin="normal"
-                    value={values.method}
+                    value={values.host}
                     onChange={handleChange}
                   />
                   <TextField
-                    id="url"
-                    label="Url"
+                    id="port"
+                    label="Port"
+                    type="number"
                     margin="normal"
-                    value={values.url}
+                    value={values.port}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    id="user"
+                    label="Username"
+                    margin="normal"
+                    value={values.user}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    id="password"
+                    label="Password"
+                    margin="normal"
+                    value={values.password}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    id="vhost"
+                    label="vhost"
+                    margin="normal"
+                    value={values.vhost || ''}
+                    onChange={handleChange}
+                  />
+                  <Typography variant="h6">Queue options</Typography>
+                  <TextField
+                    id="queueName"
+                    label="Queue name"
+                    margin="normal"
+                    value={values.queueName || ''}
+                    onChange={handleChange}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        id="queuePassive"
+                        checked={values.queuePassive}
+                        onChange={handleChange}
+                        value={true}
+                      />
+                    }
+                    label="Queue passive"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        id="queueDurable"
+                        checked={values.queueDurable}
+                        onChange={handleChange}
+                        value={true}
+                      />
+                    }
+                    label="Queue durable"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        id="queueExclusive"
+                        checked={values.queueExclusive}
+                        onChange={handleChange}
+                        value={true}
+                      />
+                    }
+                    label="Queue Exclusive"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        id="queueAutoDelete"
+                        checked={values.queueAutoDelete}
+                        onChange={handleChange}
+                        value={true}
+                      />
+                    }
+                    label="Queue AutoDelete"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        id="queueNoWait"
+                        checked={values.queueNoWait}
+                        onChange={handleChange}
+                        value={true}
+                      />
+                    }
+                    label="Queue NoWait"
+                  />
+                   <TextField
+                    id="queueTicket"
+                    label="Queue Ticket"
+                    margin="normal"
+                    type="number"
+                    value={values.queueTicket}
                     onChange={handleChange}
                   />
                 </FormControl>
