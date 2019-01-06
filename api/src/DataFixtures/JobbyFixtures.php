@@ -41,6 +41,13 @@ class JobbyFixtures extends Fixture
                     ->setPort(5681)
                     ->setUser('guest')
                     ->setPassword('guest')
+                    ->setQueueDurable(true)
+                    ->setQueuePassive(true)
+                    ->setQueueAutoDelete(true)
+                    ->setQueueNoWait(true)
+                    ->setQueueExclusive(true)
+                    ->setQueueTicket(12)
+                    ->setQueueName('fixture queue')
                     ;
         $manager->persist($rabbitMQJob);
         $cron->addRabbitMQJob($rabbitMQJob);
