@@ -24,6 +24,7 @@ class RabbitMQEditor extends React.Component {
     toggleRabbitMQEditor: PropTypes.func,
     rabbitMQJob: PropTypes.object,
     handleRabbitMQJob: PropTypes.func,
+    classes: PropTypes.object,
   };
 
   handleClose = () => {
@@ -32,7 +33,7 @@ class RabbitMQEditor extends React.Component {
 
   render() {
     const {
-      fullScreen, visible, rabbitMQJob, handleRabbitMQJob,
+      fullScreen, visible, rabbitMQJob, handleRabbitMQJob, classes,
     } = this.props;
     return (
       <Dialog
@@ -100,76 +101,158 @@ class RabbitMQEditor extends React.Component {
                     onChange={handleChange}
                   />
                   <Typography variant="h6">Queue options</Typography>
-                  <TextField
-                    id="queueName"
-                    label="Queue name"
-                    margin="normal"
-                    value={values.queueName || ''}
-                    onChange={handleChange}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        id="queuePassive"
-                        checked={values.queuePassive}
-                        onChange={handleChange}
-                        value={true}
-                      />
-                    }
-                    label="Queue passive"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        id="queueDurable"
-                        checked={values.queueDurable}
-                        onChange={handleChange}
-                        value={true}
-                      />
-                    }
-                    label="Queue durable"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        id="queueExclusive"
-                        checked={values.queueExclusive}
-                        onChange={handleChange}
-                        value={true}
-                      />
-                    }
-                    label="Queue Exclusive"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        id="queueAutoDelete"
-                        checked={values.queueAutoDelete}
-                        onChange={handleChange}
-                        value={true}
-                      />
-                    }
-                    label="Queue AutoDelete"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        id="queueNoWait"
-                        checked={values.queueNoWait}
-                        onChange={handleChange}
-                        value={true}
-                      />
-                    }
-                    label="Queue NoWait"
-                  />
-                   <TextField
-                    id="queueTicket"
-                    label="Queue Ticket"
-                    margin="normal"
-                    type="number"
-                    value={values.queueTicket}
-                    onChange={handleChange}
-                  />
+                  <FormControl fullWidth={true} className={classes.indent}>
+                    <TextField
+                      id="queueName"
+                      label="Queue name"
+                      margin="normal"
+                      value={values.queueName || ''}
+                      onChange={handleChange}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="queuePassive"
+                          checked={values.queuePassive}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Queue passive"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="queueDurable"
+                          checked={values.queueDurable}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Queue durable"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="queueExclusive"
+                          checked={values.queueExclusive}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Queue Exclusive"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="queueAutoDelete"
+                          checked={values.queueAutoDelete}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Queue AutoDelete"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="queueNoWait"
+                          checked={values.queueNoWait}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Queue NoWait"
+                    />
+                    <TextField
+                      id="queueTicket"
+                      label="Queue Ticket"
+                      margin="normal"
+                      type="number"
+                      value={values.queueTicket}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
+                  <Typography variant="h6">Exchange options</Typography>
+                  <FormControl fullWidth={true} className={classes.indent}>
+                    <TextField
+                      id="exchangeName"
+                      label="Exchange Name"
+                      margin="normal"
+                      value={values.exchangeName || ''}
+                      onChange={handleChange}
+                    />
+                    <TextField
+                      id="exchangeType"
+                      label="Exchange Type"
+                      margin="normal"
+                      value={values.exchangeType || ''}
+                      onChange={handleChange}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="exchangePassive"
+                          checked={values.exchangePassive}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Exchange passive"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="exchangeDurable"
+                          checked={values.exchangeDurable}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Exchange durable"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="exchangeAutoDelete"
+                          checked={values.exchangeAutoDelete}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Exchange AutoDelete"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="exchangeInternal"
+                          checked={values.exchangeInternal}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Exchange Internal"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          id="exchangeNoWait"
+                          checked={values.exchangeNoWait}
+                          onChange={handleChange}
+                          value={true}
+                        />
+                      }
+                      label="Exchange NoWait"
+                    />
+                    <TextField
+                      id="exchangeTicket"
+                      label="Exchange Ticket"
+                      margin="normal"
+                      type="number"
+                      value={values.exchangeTicket}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
                 </FormControl>
               </DialogContent>
               <DialogActions>
