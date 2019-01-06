@@ -10,7 +10,7 @@ class App extends React.Component {
   state = {
     menuOpen: false,
     search: '',
-    theme: 'light',
+    theme: localStorage.getItem('theme') || 'light',
   };
 
   toggleMenu = () => {
@@ -40,7 +40,9 @@ class App extends React.Component {
   handleThemeChange = () => {
     this.setState(() => ({
       theme: this.state.theme === 'light' ? 'dark' : 'light',
-    }));
+    }), () => {
+      localStorage.setItem('theme', this.state.theme);
+    });
   };
 
   render() {
