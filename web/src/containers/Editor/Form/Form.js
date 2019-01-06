@@ -263,6 +263,10 @@ class EditorForm extends React.Component {
     }));
   };
 
+  handleRabbitMQJob = (data) => {
+    console.log(data);
+  }
+
   toggleFilteringPanel = (e, expanded) => {
     this.setState(() => ({
       filteringPanel: expanded,
