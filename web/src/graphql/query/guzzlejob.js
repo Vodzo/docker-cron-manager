@@ -1,5 +1,18 @@
 import gql from 'graphql-tag';
 
+const guzzleJobFragment = gql`
+  fragment guzzleJobFragment on GuzzleJob {
+    _id
+    id
+    name
+    method
+    url
+    options
+    timeCreated
+    timeUpdated
+  }
+`;
+
 const updateGuzzleJob = gql`
   mutation guzzleJob($input: updateGuzzleJobInput) {
     updateGuzzleJob(input: $input) {
@@ -16,4 +29,4 @@ const createGuzzleJob = gql`
   }
 `;
 
-export { updateGuzzleJob, createGuzzleJob };
+export { updateGuzzleJob, createGuzzleJob, guzzleJobFragment };

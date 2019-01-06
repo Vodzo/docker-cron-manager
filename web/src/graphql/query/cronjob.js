@@ -1,4 +1,6 @@
 import gql from 'graphql-tag';
+import { guzzleJobFragment } from './guzzlejob';
+import { rabbitMQJobFragment } from './rabbitMQjob';
 
 const queryCronJob = gql`
   query cronJob($id: ID) {
@@ -34,32 +36,21 @@ const queryCronJob = gql`
       rabbitMQJobs {
         edges {
           node {
-            id
-            name
-            host
-            port
-            user
-            password
-            vhost
+            ...rabbitMQJobFragment
           }
         }
       }
       guzzleJobs {
         edges {
           node {
-            _id
-            id
-            name
-            method
-            url
-            options
-            timeCreated
-            timeUpdated
+            ...guzzleJobFragment
           }
         }
       }
     }
   }
+  ${guzzleJobFragment}
+  ${rabbitMQJobFragment}
 `;
 
 const mutateCronJob = gql`
