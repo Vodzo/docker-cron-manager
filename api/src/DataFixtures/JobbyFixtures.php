@@ -48,6 +48,14 @@ class JobbyFixtures extends Fixture
                     ->setQueueExclusive(true)
                     ->setQueueTicket(12)
                     ->setQueueName('fixture queue')
+                    ->setExchangeName('fixture exchange')
+                    ->setExchangePassive(true)
+                    ->setExchangeDurable(true)
+                    ->setExchangeAutoDelete(true)
+                    ->setExchangeInternal(true)
+                    ->setExchangeNoWait(true)
+                    ->setExchangeType('fixtrues type')
+                    ->setExchangeTicket(13)
                     ;
         $manager->persist($rabbitMQJob);
         $cron->addRabbitMQJob($rabbitMQJob);
