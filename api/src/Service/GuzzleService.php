@@ -41,7 +41,7 @@ class GuzzleService
         $response = $this->guzzleClient->request(
             $guzzleJob->getMethod(),
             $guzzleJob->getUrl(),
-            $guzzleJob->getOptions()
+            $guzzleJob->getOptions() ? json_decode($guzzleJob->getOptions(), true) : []
         );
 
         return new Response($response->getBody());
