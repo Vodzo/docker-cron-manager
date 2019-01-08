@@ -42,7 +42,7 @@ class CronExecuteGuzzleJobCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         if ($arg1) {
-            $io->note($this->guzzleService->run($arg1));
+            print($this->guzzleService->run($arg1));
         }
 
         // $io->success('Success');
