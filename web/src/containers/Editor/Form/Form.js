@@ -14,6 +14,7 @@ import {
   ExpansionPanelSummary,
   Snackbar,
 } from '@material-ui/core';
+import _ from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import { PropTypes } from 'prop-types';
@@ -25,6 +26,7 @@ import GuzzleEditor from '../GuzzleEditor/GuzzleEditor';
 import styles from '../editor.style';
 import { mutateCronJob, createCronJob } from '../../../graphql/query/cronjob';
 import { updateGuzzleJob, createGuzzleJob } from '../../../graphql/query/guzzlejob';
+import { createRabbitMQJob, updateRabbitMQJob } from '../../../graphql/query/rabbitMQjob';
 import client from '../../../graphql/client';
 import RabbitMQEditor from '../RabbitMQEditor';
 
@@ -125,6 +127,77 @@ class EditorForm extends React.Component {
     return Promise.all(mutationJobs);
   };
 
+  handleRabbitMQMutations = (rabbitMQJobs) => {
+    const mutationJobs = [];
+    rabbitMQJobs.forEach((edge) => {
+      const { node } = edge;
+      if (node.id) {
+        const job = _.pick(
+          node,
+          'id',
+          'name',
+          'exchangeAutoDelete',
+          'exchangeDurable',
+          'exchangeInternal',
+          'exchangeName',
+          'exchangeNoWait',
+          'exchangePassive',
+          'exchangeTicket',
+          'exchangeType',
+          'host',
+          'message',
+          'password',
+          'port',
+          'queueAutoDelete',
+          'queueDurable',
+          'queueExclusive',
+          'queueName',
+          'queueNoWait',
+          'queuePassive',
+          'queueTicket',
+          'user',
+          'vhost',
+        );
+        mutationJobs.push(
+          new Promise(resolve => client
+            .mutate({
+              mutation: updateRabbitMQJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  ...job,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.updateRabbitMQJob.id);
+            })),
+        );
+      } else {
+        mutationJobs.push(
+          new Promise(resolve => client
+            .mutate({
+              mutation: createRabbitMQJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  timeCreated: `${new Date().getFullYear()}-${new Date().getMonth() +
+                      1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+                  name: node.name,
+                  url: node.url,
+                  method: node.method,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.createRabbitMQJob.id);
+            })),
+        );
+      }
+    });
+    return Promise.all(mutationJobs);
+  };
+
   handleMutation = (mutation, values) => {
     const cronJob = values;
     cronJob.clientMutationId = '';
@@ -133,7 +206,11 @@ class EditorForm extends React.Component {
       saveMessageVisible: false,
     }));
 
-    this.handleGuzzleMutations(this.state.cronJob.guzzleJobs.edges).then((guzzleJobs) => {
+    Promise.all([
+      this.handleGuzzleMutations(this.state.cronJob.guzzleJobs.edges),
+      this.handleRabbitMQMutations(this.state.cronJob.rabbitMQJobs.edges),
+    ]).then((jobs) => {
+      const [guzzleJobs, rabbitMQJobs] = jobs;
       const data = {
         variables: {
           input: {
@@ -151,6 +228,7 @@ class EditorForm extends React.Component {
               `${new Date().getFullYear()}-${new Date().getMonth() +
                 1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
             guzzleJobs,
+            rabbitMQJobs,
           },
         },
       };
@@ -263,9 +341,77 @@ class EditorForm extends React.Component {
     }));
   };
 
-  handleRabbitMQJob = (data) => {
-    console.log(data);
+  handleRabbitMQJob = (rabbitMQJob) => {
+    if (rabbitMQJob.id || rabbitMQJob.queueId) {
+      this.updateRabbitMQJob(rabbitMQJob);
+    } else {
+      this.addRabbitMQJobToQueue(rabbitMQJob);
+    }
+    this.setState(() => ({
+      saveMessageVisible: true,
+    }));
+  };
+
+  updateRabbitMQJob(rabbitMQJob) {
+    this.setState((state) => {
+      const newJobs = state.cronJob.rabbitMQJobs.edges.map((edge) => {
+        if (edge.node.id === rabbitMQJob.id || edge.node.queueId === rabbitMQJob.queueId) {
+          return {
+            node: rabbitMQJob,
+          };
+        }
+        return edge;
+      });
+
+      return {
+        cronJob: {
+          ...state.cronJob,
+          rabbitMQJobs: {
+            ...state.cronJob.rabbitMQJobs,
+            edges: newJobs,
+          },
+        },
+      };
+    });
   }
+
+  addRabbitMQJobToQueue(rabbitMQJob) {
+    const queueItem = rabbitMQJob;
+    queueItem.queueId = new Date().getTime();
+    this.setState(state => ({
+      cronJob: {
+        ...state.cronJob,
+        rabbitMQJobs: {
+          ...state.cronJob.rabbitMQJobs,
+          edges: [...state.cronJob.rabbitMQJobs.edges, { node: queueItem }],
+        },
+      },
+    }));
+  }
+
+  handleDeleteRabbitMQJob = (rabbitMQJob) => {
+    this.setState((state) => {
+      const newJobs = state.cronJob.rabbitMQJobs.edges.filter((edge) => {
+        if (
+          (rabbitMQJob.id && edge.node.id === rabbitMQJob.id) ||
+          (rabbitMQJob.queueId && edge.node.queueId === rabbitMQJob.queueId)
+        ) {
+          return false;
+        }
+        return true;
+      });
+
+      return {
+        cronJob: {
+          ...state.cronJob,
+          rabbitMQJobs: {
+            ...state.cronJob.rabbitMQJobs,
+            edges: newJobs,
+          },
+        },
+      };
+    });
+  };
 
   toggleFilteringPanel = (e, expanded) => {
     this.setState(() => ({
@@ -282,6 +428,12 @@ class EditorForm extends React.Component {
   toggleMailingPanel = (e, expanded) => {
     this.setState(() => ({
       mailingPanel: expanded,
+    }));
+  };
+
+  handleCloseSnackbar = () => {
+    this.setState(() => ({
+      saveMessageVisible: false,
     }));
   };
 
@@ -546,7 +698,7 @@ class EditorForm extends React.Component {
           }}
           open={saveMessageVisible}
           autoHideDuration={5000}
-          onClose={this.handleClose}
+          onClose={this.handleCloseSnackbar}
           ContentProps={{
             'aria-describedby': 'message-id',
           }}

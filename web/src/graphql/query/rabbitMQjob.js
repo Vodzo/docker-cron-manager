@@ -31,4 +31,22 @@ const rabbitMQJobFragment = gql`
 
 const queryRabbitMQJob = null;
 
-export { rabbitMQJobFragment, queryRabbitMQJob };
+const updateRabbitMQJob = gql`
+  mutation rabbitMQJob($input: updateRabbitMQJobInput) {
+    updateRabbitMQJob(input: $input) {
+      id
+    }
+  }
+`;
+
+const createRabbitMQJob = gql`
+  mutation rabbitMQJob($input: createRabbitMQJobInput) {
+    createRabbitMQJob(input: $input) {
+      id
+    }
+  }
+`;
+
+export {
+  rabbitMQJobFragment, queryRabbitMQJob, updateRabbitMQJob, createRabbitMQJob,
+};
