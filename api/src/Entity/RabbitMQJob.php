@@ -125,14 +125,14 @@ class RabbitMQJob
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\CronJob", inversedBy="rabbitMQJobs")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="cronJobId", referencedColumnName="id")
      */
     private $cronJob;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $message;
+    private $message = '';
 
     public function getId(): ?int
     {
