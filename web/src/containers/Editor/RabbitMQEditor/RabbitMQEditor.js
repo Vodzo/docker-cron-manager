@@ -16,7 +16,6 @@ import {
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import AceEditor from 'react-ace';
-// import brace from 'brace'; // eslint-disable-line
 import 'brace/mode/json';
 import 'brace/theme/github';
 import 'brace/theme/solarized_dark';
@@ -36,7 +35,7 @@ class RabbitMQEditor extends React.Component {
     this.props.toggleRabbitMQEditor(false);
   };
 
-  mapHandler = (newValue, e, formikChangeHandler) => {
+  mapHandler = (newValue, formikChangeHandler) => {
     const event = {};
     event.target = {
       name: 'message',
@@ -83,7 +82,7 @@ class RabbitMQEditor extends React.Component {
                     id="host"
                     label="Host"
                     margin="normal"
-                    value={values.host}
+                    value={values.host || ''}
                     onChange={handleChange}
                   />
                   <TextField
@@ -91,21 +90,21 @@ class RabbitMQEditor extends React.Component {
                     label="Port"
                     type="number"
                     margin="normal"
-                    value={values.port}
+                    value={values.port || ''}
                     onChange={handleChange}
                   />
                   <TextField
                     id="user"
                     label="Username"
                     margin="normal"
-                    value={values.user}
+                    value={values.user || ''}
                     onChange={handleChange}
                   />
                   <TextField
                     id="password"
                     label="Password"
                     margin="normal"
-                    value={values.password}
+                    value={values.password || ''}
                     onChange={handleChange}
                   />
                   <TextField
@@ -184,7 +183,7 @@ class RabbitMQEditor extends React.Component {
                       label="Queue Ticket"
                       margin="normal"
                       type="number"
-                      value={values.queueTicket}
+                      value={values.queueTicket || ''}
                       onChange={handleChange}
                     />
                   </FormControl>
@@ -264,33 +263,31 @@ class RabbitMQEditor extends React.Component {
                       label="Exchange Ticket"
                       margin="normal"
                       type="number"
-                      value={values.exchangeTicket}
+                      value={values.exchangeTicket || ''}
                       onChange={handleChange}
                     />
                   </FormControl>
                   <Typography variant="h6">Message</Typography>
                   <FormControl fullWidth={true} className={classes.indent}>
-                    <div className={classes.monaco}>
-                      <AceEditor
-                        id="message"
-                        mode="json"
-                        width="100%"
-                        theme={
-                          localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
-                        }
-                        name="message"
-                        onChange={(newValue, e) => this.mapHandler(newValue, e, handleChange)}
-                        fontSize={14}
-                        showPrintMargin={false}
-                        showGutter={true}
-                        highlightActiveLine={true}
-                        value={values.message}
-                        setOptions={{
-                          showLineNumbers: true,
-                          tabSize: 2,
-                        }}
-                      />
-                    </div>
+                    <AceEditor
+                      id="message"
+                      mode="json"
+                      width="100%"
+                      theme={
+                        localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
+                      }
+                      name="message"
+                      onChange={newValue => this.mapHandler(newValue, handleChange)}
+                      fontSize={14}
+                      showPrintMargin={false}
+                      showGutter={true}
+                      highlightActiveLine={true}
+                      value={values.message || ''}
+                      setOptions={{
+                        showLineNumbers: true,
+                        tabSize: 2,
+                      }}
+                    />
                   </FormControl>
                 </FormControl>
               </DialogContent>

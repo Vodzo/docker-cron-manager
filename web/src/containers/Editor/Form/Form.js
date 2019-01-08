@@ -57,6 +57,27 @@ class EditorForm extends React.Component {
     },
     rabbitMQJob: {
       name: '',
+      message: '',
+      exchangeAutoDelete: false,
+      exchangeDurable: false,
+      exchangeInternal: false,
+      exchangeName: '',
+      exchangeNoWait: false,
+      exchangePassive: false,
+      exchangeTicket: '',
+      exchangeType: false,
+      host: '',
+      password: '',
+      port: '',
+      queueAutoDelete: false,
+      queueDurable: false,
+      queueExclusive: false,
+      queueName: '',
+      queueNoWait: false,
+      queuePassive: false,
+      queueTicket: '',
+      user: '',
+      vhost: '',
     },
   };
 
@@ -94,6 +115,7 @@ class EditorForm extends React.Component {
                   name: node.name,
                   url: node.url,
                   method: node.method,
+                  options: node.options,
                   id: node.id,
                 },
               },
@@ -114,6 +136,7 @@ class EditorForm extends React.Component {
                       1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
                   name: node.name,
                   url: node.url,
+                  options: node.options,
                   method: node.method,
                 },
               },
@@ -131,66 +154,74 @@ class EditorForm extends React.Component {
     const mutationJobs = [];
     rabbitMQJobs.forEach((edge) => {
       const { node } = edge;
+      const job = _.pick(
+        node,
+        'name',
+        'exchangeAutoDelete',
+        'exchangeDurable',
+        'exchangeInternal',
+        'exchangeName',
+        'exchangeNoWait',
+        'exchangePassive',
+        'exchangeTicket',
+        'exchangeType',
+        'host',
+        'message',
+        'password',
+        'port',
+        'queueAutoDelete',
+        'queueDurable',
+        'queueExclusive',
+        'queueName',
+        'queueNoWait',
+        'queuePassive',
+        'queueTicket',
+        'user',
+        'vhost',
+      );
       if (node.id) {
-        const job = _.pick(
-          node,
-          'id',
-          'name',
-          'exchangeAutoDelete',
-          'exchangeDurable',
-          'exchangeInternal',
-          'exchangeName',
-          'exchangeNoWait',
-          'exchangePassive',
-          'exchangeTicket',
-          'exchangeType',
-          'host',
-          'message',
-          'password',
-          'port',
-          'queueAutoDelete',
-          'queueDurable',
-          'queueExclusive',
-          'queueName',
-          'queueNoWait',
-          'queuePassive',
-          'queueTicket',
-          'user',
-          'vhost',
-        );
         mutationJobs.push(
-          new Promise(resolve => client
+          new Promise((resolve, reject) => client
             .mutate({
               mutation: updateRabbitMQJob,
               variables: {
                 input: {
                   clientMutationId: '',
+                  id: node.id,
                   ...job,
+                  exchangeTicket: node.exchangeTicket || null,
+                  queueTicket: node.queueTicket || null,
+                  port: node.port || 5672,
                 },
               },
             })
             .then((result) => {
               resolve(result.data.updateRabbitMQJob.id);
+            })
+            .catch((error) => {
+              reject(error);
             })),
         );
       } else {
         mutationJobs.push(
-          new Promise(resolve => client
+          new Promise((resolve, reject) => client
             .mutate({
               mutation: createRabbitMQJob,
               variables: {
                 input: {
                   clientMutationId: '',
-                  timeCreated: `${new Date().getFullYear()}-${new Date().getMonth() +
-                      1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-                  name: node.name,
-                  url: node.url,
-                  method: node.method,
+                  ...job,
+                  exchangeTicket: node.exchangeTicket || null,
+                  queueTicket: node.queueTicket || null,
+                  port: node.port || 5672,
                 },
               },
             })
             .then((result) => {
               resolve(result.data.createRabbitMQJob.id);
+            })
+            .catch((error) => {
+              reject(error);
             })),
         );
       }
@@ -209,50 +240,57 @@ class EditorForm extends React.Component {
     Promise.all([
       this.handleGuzzleMutations(this.state.cronJob.guzzleJobs.edges),
       this.handleRabbitMQMutations(this.state.cronJob.rabbitMQJobs.edges),
-    ]).then((jobs) => {
-      const [guzzleJobs, rabbitMQJobs] = jobs;
-      const data = {
-        variables: {
-          input: {
-            name: cronJob.name,
-            schedule: cronJob.schedule || '',
-            clientMutationId: cronJob.clientMutationId,
-            debug: cronJob.debug || false,
-            enabled: cronJob.enabled || false,
-            output: cronJob.output || '/dev/null',
-            dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
-            mailer: cronJob.mailer || 'sendmail',
-            smtpPort: cronJob.smtpPort || 25,
-            timeCreated:
-              cronJob.timeCreated ||
-              `${new Date().getFullYear()}-${new Date().getMonth() +
-                1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-            guzzleJobs,
-            rabbitMQJobs,
+    ])
+      .then((jobs) => {
+        const [guzzleJobs, rabbitMQJobs] = jobs;
+        const data = {
+          variables: {
+            input: {
+              name: cronJob.name,
+              schedule: cronJob.schedule || '',
+              clientMutationId: cronJob.clientMutationId,
+              debug: cronJob.debug || false,
+              enabled: cronJob.enabled || false,
+              output: cronJob.output || '/dev/null',
+              dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
+              mailer: cronJob.mailer || 'sendmail',
+              smtpPort: cronJob.smtpPort || 25,
+              timeCreated:
+                cronJob.timeCreated ||
+                `${new Date().getFullYear()}-${new Date().getMonth() +
+                  1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+              guzzleJobs,
+              rabbitMQJobs,
+            },
           },
-        },
-      };
+        };
 
-      if (cronJob.id) {
-        data.variables.input.id = cronJob.id;
-      }
-      mutation(data).then(() => {
-        /**
-         * set states before unmount...
-         */
-        this.setState(
-          () => ({
-            submitting: false,
-          }),
-          () => {
-            /**
-             * ...and then redirect
-             */
-            this.props.history.push('/');
-          },
-        );
+        if (cronJob.id) {
+          data.variables.input.id = cronJob.id;
+        }
+        mutation(data).then(() => {
+          /**
+           * set states before unmount...
+           */
+          this.setState(
+            () => ({
+              submitting: false,
+            }),
+            () => {
+              /**
+               * ...and then redirect
+               */
+              this.props.history.push('/');
+            },
+          );
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState(() => ({
+          submitting: false,
+        }));
       });
-    });
   };
 
   handleToggleGuzzleEditor = (guzzleEditorVisible, guzzleJob) => {
@@ -276,7 +314,10 @@ class EditorForm extends React.Component {
   updateGuzzleJob(guzzleJob) {
     this.setState((state) => {
       const newGuzzleJobs = state.cronJob.guzzleJobs.edges.map((edge) => {
-        if (edge.node.id === guzzleJob.id || edge.node.queueId === guzzleJob.queueId) {
+        if (
+          (guzzleJob.id && edge.node.id === guzzleJob.id) ||
+          (guzzleJob.queueId && edge.node.queueId === guzzleJob.queueId)
+        ) {
           return {
             node: guzzleJob,
           };
@@ -355,7 +396,10 @@ class EditorForm extends React.Component {
   updateRabbitMQJob(rabbitMQJob) {
     this.setState((state) => {
       const newJobs = state.cronJob.rabbitMQJobs.edges.map((edge) => {
-        if (edge.node.id === rabbitMQJob.id || edge.node.queueId === rabbitMQJob.queueId) {
+        if (
+          (rabbitMQJob.id && edge.node.id === rabbitMQJob.id) ||
+          (rabbitMQJob.queueId && edge.node.queueId === rabbitMQJob.queueId)
+        ) {
           return {
             node: rabbitMQJob,
           };

@@ -9,9 +9,14 @@ import {
   withStyles,
   TextField,
   FormControl,
+  Typography,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
+import AceEditor from 'react-ace';
+import 'brace/mode/json';
+import 'brace/theme/github';
+import 'brace/theme/solarized_dark';
 import styles from './guzzleEditor.style';
 
 class GuzzleEditor extends React.Component {
@@ -21,15 +26,26 @@ class GuzzleEditor extends React.Component {
     toggleGuzzleEditor: PropTypes.func,
     guzzleJob: PropTypes.object,
     handleGuzzleJob: PropTypes.func,
+    classes: PropTypes.object,
   };
 
   handleClose = () => {
     this.props.toggleGuzzleEditor(false);
   };
 
+  mapHandler = (newValue, formikChangeHandler) => {
+    const event = {};
+    event.target = {
+      name: 'options',
+      type: 'string',
+      value: newValue,
+    };
+    formikChangeHandler(event);
+  };
+
   render() {
     const {
-      fullScreen, visible, guzzleJob, handleGuzzleJob,
+      fullScreen, visible, guzzleJob, handleGuzzleJob, classes,
     } = this.props;
     return (
       <Dialog
@@ -74,10 +90,32 @@ class GuzzleEditor extends React.Component {
                     value={values.url}
                     onChange={handleChange}
                   />
+                  <Typography variant="h6">Options</Typography>
+                  <FormControl fullWidth={true} className={classes.indent}>
+                    <AceEditor
+                      id="options"
+                      mode="json"
+                      width="100%"
+                      theme={
+                        localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
+                      }
+                      name="options"
+                      onChange={newValue => this.mapHandler(newValue, handleChange)}
+                      fontSize={14}
+                      showPrintMargin={false}
+                      showGutter={true}
+                      highlightActiveLine={true}
+                      value={values.options || ''}
+                      setOptions={{
+                        showLineNumbers: true,
+                        tabSize: 2,
+                      }}
+                    />
+                  </FormControl>
                 </FormControl>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleSubmit} color="primary" variant='contained'>
+                <Button onClick={handleSubmit} color="primary" variant="contained">
                   {guzzleJob.id ? 'Update' : 'Add'}
                 </Button>
               </DialogActions>

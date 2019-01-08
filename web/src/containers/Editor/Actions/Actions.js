@@ -76,7 +76,7 @@ class Actions extends React.Component {
         />
         <Menu id="action-menu" anchorEl={anchorEl} open={menuOpen} onClose={this.handleCloseMenu}>
           <MenuItem onClick={() => this.handleGuzzleJob(false)}>Guzzle job</MenuItem>
-          <MenuItem onClick={this.handleRabbitMQJob}>RabbitMQ job</MenuItem>
+          <MenuItem onClick={() => this.handleRabbitMQJob(false)}>RabbitMQ job</MenuItem>
         </Menu>
         {cronJob.guzzleJobs && cronJob.guzzleJobs.edges.map((job, index) => (
           <Chip
