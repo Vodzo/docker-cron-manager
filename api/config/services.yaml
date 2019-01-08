@@ -41,3 +41,7 @@ services:
         arguments:
             $guzzleClient: '@eight_points_guzzle.client.default'
 
+    App\Service\LogRotateService:
+        arguments:
+            $size: '%env(LOG_ROTATE_SIZE)%'
+

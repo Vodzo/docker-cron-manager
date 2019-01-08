@@ -251,8 +251,6 @@ class EditorForm extends React.Component {
               clientMutationId: cronJob.clientMutationId,
               debug: cronJob.debug || false,
               enabled: cronJob.enabled || false,
-              output: cronJob.output || '/dev/null',
-              dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
               mailer: cronJob.mailer || 'sendmail',
               smtpPort: cronJob.smtpPort || 25,
               timeCreated:
@@ -261,6 +259,10 @@ class EditorForm extends React.Component {
                   1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
               guzzleJobs,
               rabbitMQJobs,
+              output: cronJob.output || 'var/log/default_jobby.log',
+              outputStdout: cronJob.outputStdout || 'var/log/default_jobby_out.log',
+              outputStderr: cronJob.outputStderr || 'var/log/default_jobby_err.log',
+              dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
             },
           },
         };
@@ -268,22 +270,29 @@ class EditorForm extends React.Component {
         if (cronJob.id) {
           data.variables.input.id = cronJob.id;
         }
-        mutation(data).then(() => {
-          /**
-           * set states before unmount...
-           */
-          this.setState(
-            () => ({
+        mutation(data)
+          .then(() => {
+            /**
+             * set states before unmount...
+             */
+            this.setState(
+              () => ({
+                submitting: false,
+              }),
+              () => {
+                /**
+                 * ...and then redirect
+                 */
+                this.props.history.push('/');
+              },
+            );
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setState(() => ({
               submitting: false,
-            }),
-            () => {
-              /**
-               * ...and then redirect
-               */
-              this.props.history.push('/');
-            },
-          );
-        });
+            }));
+          });
       })
       .catch((error) => {
         console.log(error);
@@ -592,13 +601,21 @@ class EditorForm extends React.Component {
                       </ExpansionPanelSummary>
                       <ExpansionPanelDetails>
                         <FormControl fullWidth={true}>
-                          <TextField id="output" label="Output" placeholder="/dev/null" />
+                          <TextField
+                            id="output"
+                            label="Output"
+                            placeholder="/dev/null"
+                            value={values.output}
+                            onChange={handleChange}
+                          />
                           <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
                           <TextField
                             id="output_stdout"
                             label="Output stdout"
                             margin="normal"
                             placeholder="/dev/null"
+                            value={values.outputStdout}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Redirect stdout to this file</FormHelperText>
                           <TextField
@@ -606,6 +623,8 @@ class EditorForm extends React.Component {
                             label="Output stderr"
                             margin="normal"
                             placeholder="/dev/null"
+                            value={values.outputStderr}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Redirect stderr to this filee</FormHelperText>
                           <TextField
@@ -613,6 +632,8 @@ class EditorForm extends React.Component {
                             label="DateFormat"
                             margin="normal"
                             placeholder="Y-m-d H:i:s"
+                            value={values.dateFormat}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Format for dates on jobby log messages</FormHelperText>
                         </FormControl>

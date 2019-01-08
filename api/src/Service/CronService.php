@@ -6,6 +6,7 @@ use Jobby\Jobby;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\CronJob;
 use JMS\Serializer\SerializerBuilder;
+use App\Service\LogRotateService;
 
 
 class CronService
@@ -25,14 +26,22 @@ class CronService
     private $em;
 
     /**
+     * Log Rotate Service
+     *
+     * @var LogRotateService
+     */
+    private $logRotate;
+
+    /**
      * Contructor
      *
      * @param Jobby $jobby
      */
-    public function __construct(Jobby $jobby, EntityManagerInterface $em)
+    public function __construct(Jobby $jobby, EntityManagerInterface $em, LogRotateService $logRotate)
     {
         $this->jobby = $jobby;
         $this->em = $em;
+        $this->logRotate = $logRotate;
     }
 
 
@@ -41,7 +50,7 @@ class CronService
         $jobs = $this->em->getRepository(CronJob::class)->findAll();
 
         $serializer = SerializerBuilder::create()->build();
-        
+        $logRotateQueue = [];
 
         foreach ($jobs as $job) {
             foreach($job->getGuzzleJobs() as $guzzle) {
@@ -49,7 +58,15 @@ class CronService
                 $config['command'] = 'php -f bin/console cron:execute-guzzle ' . $guzzle->getId();
                 $this->jobby->add(md5(microtime() . $guzzle->getName() . uniqid()), $config);
             }
+            $logRotateQueue[] = $job->getOutput();
+            $logRotateQueue[] = $job->getOutputStdout();
+            $logRotateQueue[] = $job->getOutputStderr();
         }
         $this->jobby->run();
+
+        foreach($logRotateQueue as $path) {
+            $this->logRotate->rotate($path);
+        }
+
     }
 }
