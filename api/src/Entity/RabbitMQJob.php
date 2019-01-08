@@ -129,6 +129,11 @@ class RabbitMQJob
      */
     private $cronJob;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $message;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -394,6 +399,18 @@ class RabbitMQJob
     public function setCronJob(?CronJob $cronJob): self
     {
         $this->cronJob = $cronJob;
+
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
+    public function setMessage(?string $message): self
+    {
+        $this->message = $message;
 
         return $this;
     }

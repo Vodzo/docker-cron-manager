@@ -56,6 +56,7 @@ class JobbyFixtures extends Fixture
                     ->setExchangeNoWait(true)
                     ->setExchangeType('fixtrues type')
                     ->setExchangeTicket(13)
+                    ->setMessage('test')
                     ;
         $manager->persist($rabbitMQJob);
         $cron->addRabbitMQJob($rabbitMQJob);

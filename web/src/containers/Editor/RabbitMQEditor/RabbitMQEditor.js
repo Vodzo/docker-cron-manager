@@ -15,6 +15,11 @@ import {
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
+import AceEditor from 'react-ace';
+// import brace from 'brace'; // eslint-disable-line
+import 'brace/mode/json';
+import 'brace/theme/github';
+import 'brace/theme/solarized_dark';
 import styles from './rabbitMQEditor.style';
 
 class RabbitMQEditor extends React.Component {
@@ -29,6 +34,16 @@ class RabbitMQEditor extends React.Component {
 
   handleClose = () => {
     this.props.toggleRabbitMQEditor(false);
+  };
+
+  mapHandler = (newValue, e, formikChangeHandler) => {
+    const event = {};
+    event.target = {
+      name: 'message',
+      type: 'string',
+      value: newValue,
+    };
+    formikChangeHandler(event);
   };
 
   render() {
@@ -253,10 +268,34 @@ class RabbitMQEditor extends React.Component {
                       onChange={handleChange}
                     />
                   </FormControl>
+                  <Typography variant="h6">Message</Typography>
+                  <FormControl fullWidth={true} className={classes.indent}>
+                    <div className={classes.monaco}>
+                      <AceEditor
+                        id="message"
+                        mode="json"
+                        width="100%"
+                        theme={
+                          localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
+                        }
+                        name="message"
+                        onChange={(newValue, e) => this.mapHandler(newValue, e, handleChange)}
+                        fontSize={14}
+                        showPrintMargin={false}
+                        showGutter={true}
+                        highlightActiveLine={true}
+                        value={values.message}
+                        setOptions={{
+                          showLineNumbers: true,
+                          tabSize: 2,
+                        }}
+                      />
+                    </div>
+                  </FormControl>
                 </FormControl>
               </DialogContent>
               <DialogActions>
-              <Button onClick={handleSubmit} color="primary" variant='contained'>
+                <Button onClick={handleSubmit} color="primary" variant="contained">
                   {rabbitMQJob.id ? 'Update' : 'Add'}
                 </Button>
               </DialogActions>

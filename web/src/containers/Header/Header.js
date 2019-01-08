@@ -53,8 +53,13 @@ class Header extends React.Component {
     return (
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <IconButton className={classes.menuButton} color="inherit" aria-label="Open drawer">
-            <MenuIcon onClick={this.toggleMenu} />
+          <IconButton
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="Open drawer"
+            onClick={this.toggleMenu}
+          >
+            <MenuIcon />
           </IconButton>
           <Link to="/" className={classes.title}>
             <Typography variant="h6" color="inherit" noWrap>
