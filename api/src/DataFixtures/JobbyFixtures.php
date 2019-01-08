@@ -29,7 +29,7 @@ class JobbyFixtures extends Fixture
                   ->setUrl('https://www.google.com')
                   ->setMethod('GET')
                   ->setTimeCreated(new \DateTime())
-                  ->setOptions(['verify' => false])
+                  ->setOptions(json_encode(['verify' => false], JSON_PRETTY_PRINT))
                   ;
         $manager->persist($guzzleJob);
         $cron->addGuzzleJob($guzzleJob);
@@ -56,7 +56,7 @@ class JobbyFixtures extends Fixture
                     ->setExchangeNoWait(true)
                     ->setExchangeType('fixtrues type')
                     ->setExchangeTicket(13)
-                    ->setMessage('test')
+                    ->setMessage(json_encode(['someObject' => 'test'], JSON_PRETTY_PRINT))
                     ;
         $manager->persist($rabbitMQJob);
         $cron->addRabbitMQJob($rabbitMQJob);
