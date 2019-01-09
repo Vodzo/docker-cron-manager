@@ -216,7 +216,7 @@ class RabbitMQJob
         return $this->queueName;
     }
 
-    public function setQueueName(string $queueName): self
+    public function setQueueName(?string $queueName): self
     {
         $this->queueName = $queueName;
 
