@@ -26,9 +26,13 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2,
     marginLeft: 0,
     width: '100%',
+    transitionDuration: '250ms',
     [theme.breakpoints.up('sm')]: {
       marginLeft: theme.spacing.unit * 3,
-      width: 'auto',
+      width: '288px',
+      '&:focus-within': {
+        width: '100%',
+      },
     },
   },
   searchIcon: {
