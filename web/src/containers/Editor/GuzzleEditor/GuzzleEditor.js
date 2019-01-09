@@ -14,9 +14,6 @@ import {
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import AceEditor from 'react-ace';
-import 'brace/mode/json';
-import 'brace/theme/github';
-import 'brace/theme/solarized_dark';
 import styles from './guzzleEditor.style';
 
 class GuzzleEditor extends React.Component {

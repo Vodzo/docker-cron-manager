@@ -16,14 +16,13 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link } from 'react-router-dom';
 import { Edit } from '@material-ui/icons';
 import AceEditor from 'react-ace';
-import 'brace/mode/json';
-import 'brace/theme/github';
-import 'brace/theme/solarized_dark';
 import styles from './list.style';
 import queryCronJobs from '../../graphql/query/cronjobs';
-import queryLogJob from '../../graphql/query/log';
+import { queryLogJob } from '../../graphql/query/log';
 import Fab from '../../components/fab';
 import JobToggle from './JobToggle';
+import LogViewer from '../LogViewer/index';
+import ViewLogButton from './ViewLogButton';
 
 class CronList extends React.Component {
   static propTypes = {
@@ -33,6 +32,7 @@ class CronList extends React.Component {
 
   state = {
     expanded: {},
+    selectedLog: false,
   };
 
   handleExpansion = logId => (e, expansionState) => {
@@ -47,13 +47,21 @@ class CronList extends React.Component {
     e.stopPropagation();
   };
 
-  handleJobToggle = (newState) => {
-    console.log(newState);
+  handleLogViewerClose = () => {
+    this.setState(() => ({
+      selectedLog: false,
+    }));
+  };
+
+  showLog = (logId) => {
+    this.setState(() => ({
+      selectedLog: logId,
+    }));
   };
 
   render() {
     const { classes, search } = this.props;
-    const { expanded } = this.state;
+    const { expanded, selectedLog } = this.state;
     return (
       <React.Fragment>
         <Grid container className={classes.root} spacing={16}>
@@ -106,26 +114,37 @@ class CronList extends React.Component {
                                   if (queryLogJobProps.error) return `Error! ${queryLogJobProps.error.message}`;
 
                                   return (
-                                    <AceEditor
-                                      mode="text"
-                                      width="100%"
-                                      maxLines={10}
-                                      theme={
-                                        localStorage.getItem('theme') === 'light'
-                                          ? 'github'
-                                          : 'solarized_dark'
-                                      }
-                                      fontSize={14}
-                                      showPrintMargin={false}
-                                      showGutter={true}
-                                      highlightActiveLine={false}
-                                      value={queryLogJobProps.data.log.text}
-                                      setOptions={{
-                                        showLineNumbers: true,
-                                        tabSize: 2,
-                                        readOnly: true,
-                                      }}
-                                    />
+                                    <React.Fragment>
+                                      <AceEditor
+                                        mode="text"
+                                        width="100%"
+                                        wrapEnabled={true}
+                                        theme={
+                                          localStorage.getItem('theme') === 'light'
+                                            ? 'github'
+                                            : 'solarized_dark'
+                                        }
+                                        fontSize={14}
+                                        showPrintMargin={false}
+                                        showGutter={true}
+                                        highlightActiveLine={false}
+                                        value={queryLogJobProps.data.log.text}
+                                        setOptions={{
+                                          showLineNumbers: true,
+                                          tabSize: 2,
+                                          readOnly: true,
+                                        }}
+                                      />
+                                      <ViewLogButton
+                                        color="primary"
+                                        variant="contained"
+                                        style={{ marginTop: '25px', float: 'right' }}
+                                        onClick={this.showLog}
+                                        logId={cronJob.node._id}
+                                      >
+                                        View full log
+                                      </ViewLogButton>
+                                    </React.Fragment>
                                   );
                                 }}
                               </Query>
@@ -141,6 +160,7 @@ class CronList extends React.Component {
             </Query>
           </Grid>
         </Grid>
+        <LogViewer selectedLog={selectedLog} handleLogViewerClose={this.handleLogViewerClose} />
         <Link to="/new">
           <Fab />
         </Link>

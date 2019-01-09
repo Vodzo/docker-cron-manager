@@ -5,6 +5,9 @@ import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import client from './graphql/client';
 import CronManager from './containers/CronManager';
+import 'brace/mode/json';
+import 'brace/theme/github';
+import 'brace/theme/solarized_dark';
 
 class App extends React.Component {
   state = {
