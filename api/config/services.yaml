@@ -45,3 +45,8 @@ services:
         arguments:
             $size: '%env(LOG_ROTATE_SIZE)%'
 
+    App\Service\LogService:
+        arguments:
+            $basePath: '%kernel.project_dir%'
+
+

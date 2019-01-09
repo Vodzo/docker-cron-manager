@@ -531,12 +531,12 @@ class CronJob
     /**
      * @return Collection|RabbitMQJob[]
      */
-    public function getRabbitMQJobs(): Collection
+    public function getRabbitMQJobs() : Collection
     {
         return $this->rabbitMQJobs;
     }
 
-    public function addRabbitMQJob(RabbitMQJob $rabbitMQJob): self
+    public function addRabbitMQJob(RabbitMQJob $rabbitMQJob) : self
     {
         if (!$this->rabbitMQJobs->contains($rabbitMQJob)) {
             $this->rabbitMQJobs[] = $rabbitMQJob;
@@ -546,7 +546,7 @@ class CronJob
         return $this;
     }
 
-    public function removeRabbitMQJob(RabbitMQJob $rabbitMQJob): self
+    public function removeRabbitMQJob(RabbitMQJob $rabbitMQJob) : self
     {
         if ($this->rabbitMQJobs->contains($rabbitMQJob)) {
             $this->rabbitMQJobs->removeElement($rabbitMQJob);

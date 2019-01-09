@@ -15,9 +15,15 @@ import PropTypes from 'prop-types';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link } from 'react-router-dom';
 import { Edit } from '@material-ui/icons';
+import AceEditor from 'react-ace';
+import 'brace/mode/json';
+import 'brace/theme/github';
+import 'brace/theme/solarized_dark';
 import styles from './list.style';
 import queryCronJobs from '../../graphql/query/cronjobs';
+import queryLogJob from '../../graphql/query/log';
 import Fab from '../../components/fab';
+import JobToggle from './JobToggle';
 
 class CronList extends React.Component {
   static propTypes = {
@@ -25,8 +31,29 @@ class CronList extends React.Component {
     search: PropTypes.string,
   };
 
+  state = {
+    expanded: {},
+  };
+
+  handleExpansion = logId => (e, expansionState) => {
+    this.setState((state) => {
+      const newState = state;
+      newState.expanded[logId] = expansionState;
+      return newState;
+    });
+  };
+
+  handleClick = (e) => {
+    e.stopPropagation();
+  };
+
+  handleJobToggle = (newState) => {
+    console.log(newState);
+  };
+
   render() {
     const { classes, search } = this.props;
+    const { expanded } = this.state;
     return (
       <React.Fragment>
         <Grid container className={classes.root} spacing={16}>
@@ -45,17 +72,67 @@ class CronList extends React.Component {
 
                 return data.cronJobs.edges.length
                   ? data.cronJobs.edges.map(cronJob => (
-                      <ExpansionPanel key={cronJob.node.id}>
+                      <ExpansionPanel
+                        key={cronJob.node.id}
+                        onChange={this.handleExpansion(cronJob.node._id)}
+                      >
                         <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                           <Link to={`/edit/${cronJob.node._id}`}>
                             <Edit fontSize="small" className={classes.icon} />
                           </Link>
                           <Typography className={classes.heading}>
-                            {cronJob.node.name} - {cronJob.node.schedule ? cronstrue.toString(cronJob.node.schedule) : 'not set'}
+                            {cronJob.node.name} -{' '}
+                            {cronJob.node.schedule
+                              ? cronstrue.toString(cronJob.node.schedule)
+                              : 'not set'}
                           </Typography>
+                          <JobToggle
+                            expanded={expanded[cronJob.node._id]}
+                            cronJob={cronJob.node}
+                            onChange={this.handleJobToggle}
+                          />
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
-                          <Typography>{cronJob.node.name}</Typography>
+                          <div style={{ width: '100%', textAlign: 'left' }}>
+                            <Typography>Log:</Typography>
+                            {expanded[cronJob.node._id] ? (
+                              <Query
+                                query={queryLogJob}
+                                variables={{ id: `/api/logs/${cronJob.node._id}` }}
+                                fetchPolicy="network-only"
+                              >
+                                {(queryLogJobProps) => {
+                                  if (queryLogJobProps.loading) return <LinearProgress />;
+                                  if (queryLogJobProps.error) return `Error! ${queryLogJobProps.error.message}`;
+
+                                  return (
+                                    <AceEditor
+                                      mode="text"
+                                      width="100%"
+                                      maxLines={10}
+                                      theme={
+                                        localStorage.getItem('theme') === 'light'
+                                          ? 'github'
+                                          : 'solarized_dark'
+                                      }
+                                      fontSize={14}
+                                      showPrintMargin={false}
+                                      showGutter={true}
+                                      highlightActiveLine={false}
+                                      value={queryLogJobProps.data.log.text}
+                                      setOptions={{
+                                        showLineNumbers: true,
+                                        tabSize: 2,
+                                        readOnly: true,
+                                      }}
+                                    />
+                                  );
+                                }}
+                              </Query>
+                            ) : (
+                              ''
+                            )}
+                          </div>
                         </ExpansionPanelDetails>
                       </ExpansionPanel>
                   ))
