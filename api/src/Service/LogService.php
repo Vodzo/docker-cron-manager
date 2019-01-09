@@ -59,4 +59,13 @@ class LogService
     fclose($f);
     return trim($output);
   }
+
+
+  public function read(string $path): string
+  {
+    $filepath = $this->basePath . '/' . $path;
+    // Open file
+    $f = @fopen($filepath, "rb");
+    return fread($f, filesize($filepath));
+  }
 }

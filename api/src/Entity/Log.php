@@ -13,6 +13,13 @@ class Log
   /** @var ?string */
   private $text;
 
+  /**
+   * Full log
+   *
+   * @var string
+   */
+  private $fullLog;
+
 
   /** 
    * @ApiProperty(identifier=true)
@@ -62,5 +69,18 @@ class Log
   public function getPath(): ?string
   {
     return $this->path;
+  }
+
+
+  public function setFullLog(?string $fullLog): self
+  {
+    $this->fullLog = $fullLog;
+    return $this;
+  }
+
+
+  public function getFullLog(): ?string
+  {
+    return $this->fullLog;
   }
 }
