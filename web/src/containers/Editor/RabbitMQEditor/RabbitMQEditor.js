@@ -288,6 +288,13 @@ class RabbitMQEditor extends React.Component {
                         tabSize: 2,
                       }}
                     />
+                    <TextField
+                      id="routingKey"
+                      label="Message routing key"
+                      margin="normal"
+                      value={values.routingKey || ''}
+                      onChange={handleChange}
+                    />
                   </FormControl>
                 </FormControl>
               </DialogContent>

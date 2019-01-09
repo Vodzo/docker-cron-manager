@@ -36,7 +36,7 @@ class RabbitMQFixtures extends Fixture
                     ->setQueueExclusive(false)
                     ->setQueueTicket(null)
                     ->setQueueName(null)
-                    ->setExchangeName('GC')
+                    ->setExchangeName('gc')
                     ->setExchangePassive(true)
                     ->setExchangeDurable(false)
                     ->setExchangeAutoDelete(false)
@@ -45,6 +45,7 @@ class RabbitMQFixtures extends Fixture
                     ->setExchangeType('fanout')
                     ->setExchangeTicket(null)
                     ->setMessage('')
+                    ->setRoutingKey('gc')
                     ;
         $manager->persist($rabbitMQJob);
         $cron->addRabbitMQJob($rabbitMQJob);

@@ -25,6 +25,7 @@ const rabbitMQJobFragment = gql`
     exchangeInternal
     exchangeNoWait
     exchangeTicket
+    routingKey
     message
   }
 `;

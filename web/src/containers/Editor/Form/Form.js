@@ -78,6 +78,7 @@ class EditorForm extends React.Component {
       queueTicket: '',
       user: '',
       vhost: '',
+      routingKey: '',
     },
   };
 
@@ -176,6 +177,7 @@ class EditorForm extends React.Component {
         'queueNoWait',
         'queuePassive',
         'queueTicket',
+        'routingKey',
         'user',
         'vhost',
       );

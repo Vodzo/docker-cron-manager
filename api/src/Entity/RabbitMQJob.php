@@ -134,6 +134,11 @@ class RabbitMQJob
      */
     private $message = '';
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $routingKey;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -411,6 +416,18 @@ class RabbitMQJob
     public function setMessage(?string $message): self
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getRoutingKey(): ?string
+    {
+        return $this->routingKey;
+    }
+
+    public function setRoutingKey(?string $routingKey): self
+    {
+        $this->routingKey = $routingKey;
 
         return $this;
     }
