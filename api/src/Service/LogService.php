@@ -65,7 +65,9 @@ class LogService
   {
     $filepath = $this->basePath . '/' . $path;
     // Open file
-    $f = @fopen($filepath, "rb");
-    return fread($f, filesize($filepath));
+    if ($f = @fopen($filepath, "rb")) {
+      return (string) fread($f, intval(filesize($filepath)));
+    }
+    return '';
   }
 }
