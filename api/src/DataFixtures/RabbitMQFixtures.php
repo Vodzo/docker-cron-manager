@@ -26,7 +26,7 @@ class RabbitMQFixtures extends Fixture
         $rabbitMQJob = new RabbitMQJob();
         $rabbitMQJob->setName('test rabbitMq')
                     ->setHost('ubuntu.test')
-                    ->setPort(5672)
+                    ->setPort('5672')
                     ->setUser('guest')
                     ->setPassword('guest')
                     ->setQueueDurable(false)

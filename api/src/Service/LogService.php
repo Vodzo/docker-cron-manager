@@ -43,11 +43,11 @@ class LogService
 			// Do the jump (backwards, relative to where we are)
       fseek($f, -$seek, SEEK_CUR);
 			// Read a chunk and prepend it to our output
-      $output = ($chunk = fread($f, $seek)) . $output;
+      $output = ($chunk = fread($f, (int) $seek)) . $output;
 			// Jump back to where we started reading
-      fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+      fseek($f, -mb_strlen((string) $chunk, '8bit'), SEEK_CUR);
 			// Decrease our line counter
-      $lines -= substr_count($chunk, "\n");
+      $lines -= substr_count((string) $chunk, "\n");
     }
 		// While we have too many lines
 		// (Because of buffer size we might have read too many)

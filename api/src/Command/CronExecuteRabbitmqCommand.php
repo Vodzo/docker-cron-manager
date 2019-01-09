@@ -39,10 +39,10 @@ class CronExecuteRabbitmqCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
+        $arg1 = intval($input->getArgument('arg1'));
 
         if ($arg1) {
-            print($this->rabbitMQService->run($arg1));
+            print($this->rabbitMQService->run($arg1)->getOutput());
         }
     }
 }

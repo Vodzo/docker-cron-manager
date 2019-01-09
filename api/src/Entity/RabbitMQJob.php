@@ -29,7 +29,7 @@ class RabbitMQJob
     private $host;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
     private $port;
 
@@ -74,7 +74,7 @@ class RabbitMQJob
     private $queueAutoDelete = false;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $queueNoWait = false;
 
@@ -168,12 +168,12 @@ class RabbitMQJob
         return $this;
     }
 
-    public function getPort(): ?int
+    public function getPort(): string
     {
         return $this->port;
     }
 
-    public function setPort(int $port): self
+    public function setPort(string $port): self
     {
         $this->port = $port;
 
@@ -276,12 +276,12 @@ class RabbitMQJob
         return $this;
     }
 
-    public function getQueueNoWait(): ?string
+    public function getQueueNoWait(): ?bool
     {
         return $this->queueNoWait;
     }
 
-    public function setQueueNoWait(?string $queueNoWait): self
+    public function setQueueNoWait(?bool $queueNoWait): self
     {
         $this->queueNoWait = $queueNoWait;
 

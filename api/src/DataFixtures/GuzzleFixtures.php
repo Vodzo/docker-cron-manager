@@ -24,11 +24,12 @@ class GuzzleFixtures extends Fixture
              ;
         
         $guzzleJob = new GuzzleJob();
+        $options = json_encode(['verify' => false], JSON_PRETTY_PRINT) ? (string) json_encode(['verify' => false], JSON_PRETTY_PRINT) : null;
         $guzzleJob->setName('ping google')
                   ->setUrl('https://www.google.com')
                   ->setMethod('GET')
                   ->setTimeCreated(new \DateTime())
-                  ->setOptions(json_encode(['verify' => false], JSON_PRETTY_PRINT))
+                  ->setOptions($options)
                   ;
         $manager->persist($guzzleJob);
         $cron->addGuzzleJob($guzzleJob);

@@ -49,6 +49,7 @@ class CronService
     {
         $jobs = $this->em->getRepository(CronJob::class)->findAll();
 
+        /** @var \JMS\Serializer\Serializer $serializer */
         $serializer = SerializerBuilder::create()->build();
         $logRotateQueue = [];
 

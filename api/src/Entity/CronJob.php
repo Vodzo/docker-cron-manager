@@ -513,7 +513,7 @@ class CronJob
     /**
      *
      * @param \App\Entity\GuzzleJob $guzzleJob
-     * @return Application
+     * @return CronJob
      */
     public function removeGuzzleJob(GuzzleJob $guzzleJob) : self
     {

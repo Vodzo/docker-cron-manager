@@ -6,9 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\GuzzleJob;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Response;
+use App\Service\RunnerInterface;
 
-class GuzzleService
+class GuzzleService implements RunnerInterface
 {
+    use \App\Service\RunnerTrait;
 
     /**
      * Entity manager
@@ -27,7 +29,8 @@ class GuzzleService
     /**
      * Contructor
      *
-     * @param Jobby $jobby
+     * @param EntityManagerInterface $em
+     * @param Client $guzzleClient
      */
     public function __construct(EntityManagerInterface $em, Client $guzzleClient)
     {
@@ -35,15 +38,23 @@ class GuzzleService
         $this->guzzleClient = $guzzleClient;
     }
 
-    public function run(int $guzzleJobId)
+    public function run(int $guzzleJobId): RunnerInterface
     {
         $guzzleJob = $this->em->getRepository(GuzzleJob::class)->find($guzzleJobId);
+
+        $cronJob = $guzzleJob->getCronJob();
+        $this->setTimestampFormat($cronJob->getDateFormat())
+             ->setJobname($cronJob->getName())
+            ;
+
         $response = $this->guzzleClient->request(
             $guzzleJob->getMethod(),
             $guzzleJob->getUrl(),
             $guzzleJob->getOptions() ? json_decode($guzzleJob->getOptions(), true) : []
         );
 
-        return new Response($response->getBody());
+        $this->addOutput($response->getBody());
+
+        return $this;
     }
 }

@@ -7,9 +7,11 @@ use App\Entity\RabbitMQJob;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use App\Service\RunnerInterface;
 
-class RabbitMQService
+class RabbitMQService implements RunnerInterface
 {
+  use \App\Service\RunnerTrait;
 
   /**
    * Entity manager
@@ -21,26 +23,37 @@ class RabbitMQService
   /**
    * Contructor
    *
-   * @param Jobby $jobby
+   * @param EntityManagerInterface $em
    */
   public function __construct(EntityManagerInterface $em)
   {
     $this->em = $em;
   }
 
-  public function run(int $rabbitMQJobId)
+  public function run(int $rabbitMQJobId): RunnerInterface
   {
     /**
      * @var RabbitMQJob $rabbitMQJob
      */
     $rabbitMQJob = $this->em->getRepository(RabbitMQJob::class)->find($rabbitMQJobId);
 
-    $connection = new AMQPStreamConnection(
-      $rabbitMQJob->getHost(),
-      $rabbitMQJob->getPort(),
-      $rabbitMQJob->getUser(),
-      $rabbitMQJob->getPassword()
-    );
+    $cronJob = $rabbitMQJob->getCronJob();
+    $this->setTimestampFormat($cronJob->getDateFormat())
+         ->setJobname($cronJob->getName())
+         ;
+
+    try {
+      $connection = new AMQPStreamConnection(
+        $rabbitMQJob->getHost(),
+        $rabbitMQJob->getPort(),
+        $rabbitMQJob->getUser(),
+        $rabbitMQJob->getPassword()
+      );
+    } catch(\ErrorException $e) {
+      $this->addOutput('Failed to connect');
+      return $this;
+    }
+    
 
     $channel = $connection->channel();
 
@@ -76,11 +89,14 @@ class RabbitMQService
     try {
       $channel->basic_publish($msg, $rabbitMQJob->getExchangeName(), $rabbitMQJob->getRoutingKey());
     } catch(AMQPRuntimeException $e) {
-      print('Job failed');
+      $this->addOutput('Job failed');
+    } finally {
+      $channel->close();
+      $connection->close();
     }
-    $channel->close();
-    $connection->close();
 
-    return 'Message sent';
+    $this->addOutput('RabbitMQ job ' . $rabbitMQJob->getName() . ' executed successfully');
+
+    return $this;
   }
 }

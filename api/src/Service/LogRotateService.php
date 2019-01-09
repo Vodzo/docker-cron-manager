@@ -14,6 +14,13 @@ class LogRotateService
    */
   private $logSize;
 
+  /**
+   * Max file size before rotate
+   *
+   * @var string
+   */
+  private $size;
+
 
 
   public function __construct(string $size = '12MB')
