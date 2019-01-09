@@ -52,11 +52,17 @@ class CronService
         $serializer = SerializerBuilder::create()->build();
         $logRotateQueue = [];
 
+        /** @var CronJob $job */
         foreach ($jobs as $job) {
             foreach($job->getGuzzleJobs() as $guzzle) {
                 $config = $serializer->toArray($job);
                 $config['command'] = 'php -f bin/console cron:execute-guzzle ' . $guzzle->getId();
                 $this->jobby->add(md5(microtime() . $guzzle->getName() . uniqid()), $config);
+            }
+            foreach($job->getRabbitMQJobs() as $rabbitMq) {
+                $config = $serializer->toArray($job);
+                $config['command'] = 'php -f bin/console cron:execute-rabbitmq ' . $rabbitMq->getId();
+                $this->jobby->add(md5(microtime() . $rabbitMq->getName() . uniqid()), $config);
             }
             $logRotateQueue[] = $job->getOutput();
             $logRotateQueue[] = $job->getOutputStdout();
