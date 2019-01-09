@@ -9,7 +9,7 @@ matrix:
         - composer install
       script:
         - php bin/phpunit
-        - composer phpstan
+        - composer analyze
 
     - language: node_js
       node_js:
