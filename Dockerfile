@@ -19,7 +19,7 @@ RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev \
 # fix log path
     && sed -i "s/error_log.*/error_log = \/var\/log\/php7\.2\-fpm\.error.log/g" /usr/local/etc/php-fpm.d/docker.conf \
     && sed -i "s/access.log.*/access.log = \/var\/log\/php7\.2\-fpm\.access.log/g" /usr/local/etc/php-fpm.d/docker.conf \
-    && ln -sf /proc/1/fd/1 /var/log/php7.2-fpm.access.log \
+#    && ln -sf /proc/1/fd/1 /var/log/php7.2-fpm.access.log \ # skip access log because its copy of nginx access log
     && ln -sf /proc/1/fd/2 /var/log/php7.2-fpm.error.log
 # change to www-data user
 RUN rm -rf /var/www/* && chown www-data.www-data -R /var/www
@@ -48,33 +48,26 @@ COPY services/configs/webserver/nginx.conf  /etc/supervisor.d/webserver:nginx.in
 #copy react app
 COPY --from=builder /home/node/app/build/ /var/www/public/
 
-# # rabbitmq
-# RUN cd /tmp \
-#     && wget -O rabbitmq.tar.gz https://github.com/ricbra/rabbitmq-cli-consumer/releases/download/1.4.2/rabbitmq-cli-consumer-linux-amd64.tar.gz \
-#     && tar -xvf rabbitmq.tar.gz \
-#     && mv rabbitmq-cli-consumer /usr/bin/ \
-#     && cd / \
-#     && rm -rf /tmp/* \
-#     && mkdir /var/log/rabbitmq \
-#     && mkdir /etc/rabbitmq-cli-consumer
-# COPY services/configs/rabbitmq-cli-consumer.conf /etc/rabbitmq-cli-consumer/zipper.conf
-# RUN ln -sf /proc/1/fd/1 /var/log/rabbitmq/info.log \
-#     && ln -sf /proc/1/fd/2 /var/log/rabbitmq/error.log
-
-#symlink jobby debug to docker log
+# symlink jobby debug to docker log
+RUN ln -sf /proc/1/fd/1 /var/www/var/log/default_jobby_out.log \
+    && ln -sf /proc/1/fd/2 /var/www/var/log/default_jobby_err.log
 
 ENV APP_ENV=prod
 ENV DATABASE_URL=sqlite:///%kernel.project_dir%/var/data.db
+ENV RABBITMQ_URL=amqp://guest:guest@localhost:5672
+ENV CORS_ALLOW_ORIGIN=^https?://localhost(:[0-9]+)?$
+ENV LOG_ROTATE_SIZE=12MB
+
 WORKDIR /var/www
 
 ENTRYPOINT ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
 EXPOSE 80
 
-# HEALTHCHECK --interval=10s --timeout=3s \
-#     CMD \
-#     SCRIPT_FILENAME=/var/www/public/index.php \
-#     DOCUMENT_ROOT=/var/www/public \
-#     REQUEST_URI=/api/health \
-#     REQUEST_METHOD=GET \
-#     cgi-fcgi -bind -connect 127.0.0.1:9000 || exit 1
+HEALTHCHECK --interval=10s --timeout=3s \
+    CMD \
+    SCRIPT_FILENAME=/var/www/public/index.php \
+    DOCUMENT_ROOT=/var/www/public \
+    REQUEST_URI=/api/health \
+    REQUEST_METHOD=GET \
+    cgi-fcgi -bind -connect 127.0.0.1:9000 || exit 1
