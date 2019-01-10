@@ -7,14 +7,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 use App\Entity\CronJob;
 use App\Entity\GuzzleJob;
 
-class JobbyFixtures extends Fixture
+class GuzzleFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
         $cron = new CronJob();
         $cron->setCommand('dir')
              ->setSchedule('* * * * *')
-             ->setName('Fixtures test')
+             ->setName('Guzzle test')
              ->setDebug(true)
              ->setEnabled(true)
              ->setTimeCreated(new \DateTime())
@@ -24,11 +24,12 @@ class JobbyFixtures extends Fixture
              ;
         
         $guzzleJob = new GuzzleJob();
+        $options = json_encode(['verify' => false], JSON_PRETTY_PRINT) ? (string) json_encode(['verify' => false], JSON_PRETTY_PRINT) : null;
         $guzzleJob->setName('ping google')
                   ->setUrl('https://www.google.com')
                   ->setMethod('GET')
                   ->setTimeCreated(new \DateTime())
-                  ->setOptions(['verify' => false])
+                  ->setOptions($options)
                   ;
         $manager->persist($guzzleJob);
         $cron->addGuzzleJob($guzzleJob);

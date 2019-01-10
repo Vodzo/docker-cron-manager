@@ -5,12 +5,15 @@ import { ApolloProvider } from 'react-apollo';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import client from './graphql/client';
 import CronManager from './containers/CronManager';
+import 'brace/mode/json';
+import 'brace/theme/github';
+import 'brace/theme/solarized_dark';
 
 class App extends React.Component {
   state = {
     menuOpen: false,
     search: '',
-    theme: 'light',
+    theme: localStorage.getItem('theme') || 'light',
   };
 
   toggleMenu = () => {
@@ -40,7 +43,9 @@ class App extends React.Component {
   handleThemeChange = () => {
     this.setState(() => ({
       theme: this.state.theme === 'light' ? 'dark' : 'light',
-    }));
+    }), () => {
+      localStorage.setItem('theme', this.state.theme);
+    });
   };
 
   render() {
@@ -52,6 +57,9 @@ class App extends React.Component {
         primary: {
           main: this.state.theme === 'light' ? '#3f51b5' : '#3f95df',
         },
+      },
+      typography: {
+        useNextVariants: true,
       },
     });
 

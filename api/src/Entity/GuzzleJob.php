@@ -34,9 +34,9 @@ class GuzzleJob
     private $url;
 
     /**
-     * @ORM\Column(type="json", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
-    private $options = [];
+    private $options = '';
 
     /**
      * @ORM\Column(type="datetime")
@@ -97,12 +97,12 @@ class GuzzleJob
         return $this;
     }
 
-    public function getOptions(): ?array
+    public function getOptions(): ?string
     {
         return $this->options;
     }
 
-    public function setOptions(?array $options): self
+    public function setOptions(?string $options): self
     {
         $this->options = $options;
 

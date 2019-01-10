@@ -9,6 +9,7 @@ const queryCronJobs = gql`
           id
           name
           schedule
+          enabled
           guzzleJobs {
             edges {
               node {

@@ -9,9 +9,11 @@ import {
   withStyles,
   TextField,
   FormControl,
+  Typography,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
+import AceEditor from 'react-ace';
 import styles from './guzzleEditor.style';
 
 class GuzzleEditor extends React.Component {
@@ -21,15 +23,26 @@ class GuzzleEditor extends React.Component {
     toggleGuzzleEditor: PropTypes.func,
     guzzleJob: PropTypes.object,
     handleGuzzleJob: PropTypes.func,
+    classes: PropTypes.object,
   };
 
   handleClose = () => {
     this.props.toggleGuzzleEditor(false);
   };
 
+  mapHandler = (newValue, formikChangeHandler) => {
+    const event = {};
+    event.target = {
+      name: 'options',
+      type: 'string',
+      value: newValue,
+    };
+    formikChangeHandler(event);
+  };
+
   render() {
     const {
-      fullScreen, visible, guzzleJob, handleGuzzleJob,
+      fullScreen, visible, guzzleJob, handleGuzzleJob, classes,
     } = this.props;
     return (
       <Dialog
@@ -46,18 +59,6 @@ class GuzzleEditor extends React.Component {
           onSubmit={(values) => {
             handleGuzzleJob(values);
             this.handleClose();
-            // MyImaginaryRestApiCall(user.id, values).then(
-            //   (updatedUser) => {
-            //     actions.setSubmitting(false);
-            //     updateUser(updatedUser);
-            //     onClose();
-            //   },
-            //   (error) => {
-            //     actions.setSubmitting(false);
-            //     actions.setErrors(transformMyRestApiErrorsToAnObject(error));
-            //     actions.setStatus({ msg: 'Set some arbitrary status or data' });
-            //   },
-            // );
           }}
           render={({ values, handleChange, handleSubmit }) => (
             <React.Fragment>
@@ -86,11 +87,33 @@ class GuzzleEditor extends React.Component {
                     value={values.url}
                     onChange={handleChange}
                   />
+                  <Typography variant="h6">Options</Typography>
+                  <FormControl fullWidth={true} className={classes.indent}>
+                    <AceEditor
+                      id="options"
+                      mode="json"
+                      width="100%"
+                      theme={
+                        localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
+                      }
+                      name="options"
+                      onChange={newValue => this.mapHandler(newValue, handleChange)}
+                      fontSize={14}
+                      showPrintMargin={false}
+                      showGutter={true}
+                      highlightActiveLine={true}
+                      value={values.options || ''}
+                      setOptions={{
+                        showLineNumbers: true,
+                        tabSize: 2,
+                      }}
+                    />
+                  </FormControl>
                 </FormControl>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleSubmit} color="primary">
-                  Save
+                <Button onClick={handleSubmit} color="primary" variant="contained">
+                  {guzzleJob.id ? 'Update' : 'Add'}
                 </Button>
               </DialogActions>
             </React.Fragment>

@@ -11,6 +11,7 @@
         "jms/serializer": "^2.0",
         "php-amqplib/rabbitmq-bundle": "^1.14",
         "sensio/framework-extra-bundle": "^5.1",
+        "studio24/rotate": "^1.0",
         "symfony/asset": "*",
         "symfony/console": "*",
         "symfony/expression-language": "*",
@@ -31,6 +32,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.0",
+        "phpstan/phpstan-doctrine": "^0.10.0",
+        "phpstan/phpstan-shim": "^0.10.8",
         "symfony/debug-pack": "*",
         "symfony/dotenv": "*",
         "symfony/maker-bundle": "^1.0",
@@ -73,6 +76,9 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "analyze": [
+            "phpstan analyse src -l 6 -c phpstan.neon"
         ]
     },
     "conflict": {

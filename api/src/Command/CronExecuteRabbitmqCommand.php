@@ -8,23 +8,23 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Service\GuzzleService;
+use App\Service\RabbitMQService;
 
-class CronExecuteGuzzleJobCommand extends Command
+class CronExecuteRabbitmqCommand extends Command
 {
-    protected static $defaultName = 'cron:execute-guzzle';
+    protected static $defaultName = 'cron:execute-rabbitmq';
 
     /**
-     * Guzzle Service
+     * RabbitMQ Service
      *
-     * @var GuzzleService
+     * @var RabbitMQService
      */
-    private $guzzleService;
+    private $rabbitMQService;
 
-    public function __construct(GuzzleService $guzzleService)
+    public function __construct(RabbitMQService $rabbitMQService)
     {
         parent::__construct();
-        $this->guzzleService = $guzzleService;
+        $this->rabbitMQService = $rabbitMQService;
     }
 
     protected function configure()
@@ -42,7 +42,7 @@ class CronExecuteGuzzleJobCommand extends Command
         $arg1 = intval($input->getArgument('arg1'));
 
         if ($arg1) {
-            print($this->guzzleService->run($arg1)->getOutput());
+            print($this->rabbitMQService->run($arg1)->getOutput());
         }
     }
 }

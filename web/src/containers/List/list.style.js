@@ -8,6 +8,13 @@ const styles = () => ({
   icon: {
     marginRight: '15px',
   },
+  switch: {
+    height: '24px',
+  },
+  rightLabel: {
+    position: 'absolute',
+    right: '25px',
+  },
 });
 
 export default styles;

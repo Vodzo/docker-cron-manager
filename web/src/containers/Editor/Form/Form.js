@@ -1,9 +1,6 @@
 import {
-  DialogTitle,
-  DialogContent,
   Tooltip,
   Switch,
-  DialogContentText,
   FormControl,
   TextField,
   ExpansionPanel,
@@ -13,21 +10,33 @@ import {
   FormControlLabel,
   withStyles,
   Button,
+  CircularProgress,
+  ExpansionPanelSummary,
+  Snackbar,
 } from '@material-ui/core';
+import _ from 'lodash';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Mutation } from 'react-apollo';
 import { Formik } from 'formik';
+import { withRouter } from 'react-router-dom';
 import Actions from '../Actions/index';
 import GuzzleEditor from '../GuzzleEditor/GuzzleEditor';
 import styles from '../editor.style';
-import { mutateCronJob } from '../../../graphql/query/cronjob';
+import { mutateCronJob, createCronJob } from '../../../graphql/query/cronjob';
+import { updateGuzzleJob, createGuzzleJob } from '../../../graphql/query/guzzlejob';
+import { createRabbitMQJob, updateRabbitMQJob } from '../../../graphql/query/rabbitMQjob';
+import client from '../../../graphql/client';
+import RabbitMQEditor from '../RabbitMQEditor';
 
 class EditorForm extends React.Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
     cronJob: PropTypes.object,
     guzzleJob: PropTypes.object,
+    rabbitMQJob: PropTypes.object,
+    history: PropTypes.object,
   };
 
   static defaultProps = {
@@ -37,9 +46,39 @@ class EditorForm extends React.Component {
       guzzleJobs: {
         edges: [],
       },
+      rabbitMQJobs: {
+        edges: [],
+      },
     },
     guzzleJob: {
       name: '',
+      method: '',
+      url: '',
+    },
+    rabbitMQJob: {
+      name: '',
+      message: '',
+      exchangeAutoDelete: false,
+      exchangeDurable: false,
+      exchangeInternal: false,
+      exchangeName: '',
+      exchangeNoWait: false,
+      exchangePassive: false,
+      exchangeTicket: '',
+      exchangeType: false,
+      host: '',
+      password: '',
+      port: '',
+      queueAutoDelete: false,
+      queueDurable: false,
+      queueExclusive: false,
+      queueName: '',
+      queueNoWait: false,
+      queuePassive: false,
+      queueTicket: '',
+      user: '',
+      vhost: '',
+      routingKey: '',
     },
   };
 
@@ -49,23 +88,220 @@ class EditorForm extends React.Component {
     this.state = {
       cronJob: props.cronJob,
       guzzleEditorVisible: false,
+      rabbitMQEditorVisible: false,
       guzzleJob: props.guzzleJob,
+      rabbitMQJob: props.rabbitMQJob,
+      submitting: false,
+      filteringPanel: false,
+      loggingPanel: false,
+      mailingPanel: false,
+      saveMessageVisible: false,
     };
   }
 
-  handleMutation = (updateCronJob, values) => {
+  handleGuzzleMutations = (guzzleJobs) => {
+    const mutationJobs = [];
+    guzzleJobs.forEach((edge) => {
+      const { node } = edge;
+      if (node.id) {
+        mutationJobs.push(
+          new Promise(resolve => client
+            .mutate({
+              mutation: updateGuzzleJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  timeUpdated: `${new Date().getFullYear()}-${new Date().getMonth() +
+                      1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+                  name: node.name,
+                  url: node.url,
+                  method: node.method,
+                  options: node.options,
+                  id: node.id,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.updateGuzzleJob.id);
+            })),
+        );
+      } else {
+        mutationJobs.push(
+          new Promise(resolve => client
+            .mutate({
+              mutation: createGuzzleJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  timeCreated: `${new Date().getFullYear()}-${new Date().getMonth() +
+                      1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+                  name: node.name,
+                  url: node.url,
+                  options: node.options,
+                  method: node.method,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.createGuzzleJob.id);
+            })),
+        );
+      }
+    });
+    return Promise.all(mutationJobs);
+  };
+
+  handleRabbitMQMutations = (rabbitMQJobs) => {
+    const mutationJobs = [];
+    rabbitMQJobs.forEach((edge) => {
+      const { node } = edge;
+      const job = _.pick(
+        node,
+        'name',
+        'exchangeAutoDelete',
+        'exchangeDurable',
+        'exchangeInternal',
+        'exchangeName',
+        'exchangeNoWait',
+        'exchangePassive',
+        'exchangeTicket',
+        'exchangeType',
+        'host',
+        'message',
+        'password',
+        'port',
+        'queueAutoDelete',
+        'queueDurable',
+        'queueExclusive',
+        'queueName',
+        'queueNoWait',
+        'queuePassive',
+        'queueTicket',
+        'routingKey',
+        'user',
+        'vhost',
+      );
+      if (node.id) {
+        mutationJobs.push(
+          new Promise((resolve, reject) => client
+            .mutate({
+              mutation: updateRabbitMQJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  id: node.id,
+                  ...job,
+                  exchangeTicket: node.exchangeTicket || null,
+                  queueTicket: node.queueTicket || null,
+                  port: node.port || 5672,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.updateRabbitMQJob.id);
+            })
+            .catch((error) => {
+              reject(error);
+            })),
+        );
+      } else {
+        mutationJobs.push(
+          new Promise((resolve, reject) => client
+            .mutate({
+              mutation: createRabbitMQJob,
+              variables: {
+                input: {
+                  clientMutationId: '',
+                  ...job,
+                  exchangeTicket: node.exchangeTicket || null,
+                  queueTicket: node.queueTicket || null,
+                  port: node.port || 5672,
+                },
+              },
+            })
+            .then((result) => {
+              resolve(result.data.createRabbitMQJob.id);
+            })
+            .catch((error) => {
+              reject(error);
+            })),
+        );
+      }
+    });
+    return Promise.all(mutationJobs);
+  };
+
+  handleMutation = (mutation, values) => {
     const cronJob = values;
     cronJob.clientMutationId = '';
-    updateCronJob({
-      variables: {
-        input: {
-          id: cronJob.id,
-          name: cronJob.name,
-          schedule: cronJob.schedule,
-          clientMutationId: cronJob.clientMutationId,
-        },
-      },
-    });
+
+    this.setState(() => ({
+      saveMessageVisible: false,
+    }));
+
+    Promise.all([
+      this.handleGuzzleMutations(this.state.cronJob.guzzleJobs.edges),
+      this.handleRabbitMQMutations(this.state.cronJob.rabbitMQJobs.edges),
+    ])
+      .then((jobs) => {
+        const [guzzleJobs, rabbitMQJobs] = jobs;
+        const data = {
+          variables: {
+            input: {
+              name: cronJob.name,
+              schedule: cronJob.schedule || '',
+              clientMutationId: cronJob.clientMutationId,
+              debug: cronJob.debug || false,
+              enabled: cronJob.enabled || false,
+              mailer: cronJob.mailer || 'sendmail',
+              smtpPort: cronJob.smtpPort || 25,
+              timeCreated:
+                cronJob.timeCreated ||
+                `${new Date().getFullYear()}-${new Date().getMonth() +
+                  1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+              guzzleJobs,
+              rabbitMQJobs,
+              output: cronJob.output || 'var/log/default_jobby.log',
+              outputStdout: cronJob.outputStdout || 'var/log/default_jobby_out.log',
+              outputStderr: cronJob.outputStderr || 'var/log/default_jobby_err.log',
+              dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
+            },
+          },
+        };
+
+        if (cronJob.id) {
+          data.variables.input.id = cronJob.id;
+        }
+        mutation(data)
+          .then(() => {
+            /**
+             * set states before unmount...
+             */
+            this.setState(
+              () => ({
+                submitting: false,
+              }),
+              () => {
+                /**
+                 * ...and then redirect
+                 */
+                this.props.history.push('/');
+              },
+            );
+          })
+          .catch((error) => {
+            console.log(error);
+            this.setState(() => ({
+              submitting: false,
+            }));
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState(() => ({
+          submitting: false,
+        }));
+      });
   };
 
   handleToggleGuzzleEditor = (guzzleEditorVisible, guzzleJob) => {
@@ -81,12 +317,18 @@ class EditorForm extends React.Component {
     } else {
       this.addToQueue(guzzleJob);
     }
+    this.setState(() => ({
+      saveMessageVisible: true,
+    }));
   };
 
   updateGuzzleJob(guzzleJob) {
     this.setState((state) => {
       const newGuzzleJobs = state.cronJob.guzzleJobs.edges.map((edge) => {
-        if (edge.node.id === guzzleJob.id || edge.node.queueId === guzzleJob.queueId) {
+        if (
+          (guzzleJob.id && edge.node.id === guzzleJob.id) ||
+          (guzzleJob.queueId && edge.node.queueId === guzzleJob.queueId)
+        ) {
           return {
             node: guzzleJob,
           };
@@ -123,7 +365,10 @@ class EditorForm extends React.Component {
   handleDeleteGuzzleJob = (guzzleJob) => {
     this.setState((state) => {
       const newGuzzleJobs = state.cronJob.guzzleJobs.edges.filter((edge) => {
-        if (edge.node.id === guzzleJob.id || edge.node.queueId === guzzleJob.queueId) {
+        if (
+          (guzzleJob.id && edge.node.id === guzzleJob.id) ||
+          (guzzleJob.queueId && edge.node.queueId === guzzleJob.queueId)
+        ) {
           return false;
         }
         return true;
@@ -141,53 +386,163 @@ class EditorForm extends React.Component {
     });
   };
 
+  handleToggleRabbitMQEditor = (rabbitMQEditorVisible, rabbitMQJob) => {
+    this.setState(() => ({
+      rabbitMQEditorVisible,
+      rabbitMQJob: rabbitMQJob || this.constructor.defaultProps.rabbitMQJob,
+    }));
+  };
+
+  handleRabbitMQJob = (rabbitMQJob) => {
+    if (rabbitMQJob.id || rabbitMQJob.queueId) {
+      this.updateRabbitMQJob(rabbitMQJob);
+    } else {
+      this.addRabbitMQJobToQueue(rabbitMQJob);
+    }
+    this.setState(() => ({
+      saveMessageVisible: true,
+    }));
+  };
+
+  updateRabbitMQJob(rabbitMQJob) {
+    this.setState((state) => {
+      const newJobs = state.cronJob.rabbitMQJobs.edges.map((edge) => {
+        if (
+          (rabbitMQJob.id && edge.node.id === rabbitMQJob.id) ||
+          (rabbitMQJob.queueId && edge.node.queueId === rabbitMQJob.queueId)
+        ) {
+          return {
+            node: rabbitMQJob,
+          };
+        }
+        return edge;
+      });
+
+      return {
+        cronJob: {
+          ...state.cronJob,
+          rabbitMQJobs: {
+            ...state.cronJob.rabbitMQJobs,
+            edges: newJobs,
+          },
+        },
+      };
+    });
+  }
+
+  addRabbitMQJobToQueue(rabbitMQJob) {
+    const queueItem = rabbitMQJob;
+    queueItem.queueId = new Date().getTime();
+    this.setState(state => ({
+      cronJob: {
+        ...state.cronJob,
+        rabbitMQJobs: {
+          ...state.cronJob.rabbitMQJobs,
+          edges: [...state.cronJob.rabbitMQJobs.edges, { node: queueItem }],
+        },
+      },
+    }));
+  }
+
+  handleDeleteRabbitMQJob = (rabbitMQJob) => {
+    this.setState((state) => {
+      const newJobs = state.cronJob.rabbitMQJobs.edges.filter((edge) => {
+        if (
+          (rabbitMQJob.id && edge.node.id === rabbitMQJob.id) ||
+          (rabbitMQJob.queueId && edge.node.queueId === rabbitMQJob.queueId)
+        ) {
+          return false;
+        }
+        return true;
+      });
+
+      return {
+        cronJob: {
+          ...state.cronJob,
+          rabbitMQJobs: {
+            ...state.cronJob.rabbitMQJobs,
+            edges: newJobs,
+          },
+        },
+      };
+    });
+  };
+
+  toggleFilteringPanel = (e, expanded) => {
+    this.setState(() => ({
+      filteringPanel: expanded,
+    }));
+  };
+
+  toggleLoggingPanel = (e, expanded) => {
+    this.setState(() => ({
+      loggingPanel: expanded,
+    }));
+  };
+
+  toggleMailingPanel = (e, expanded) => {
+    this.setState(() => ({
+      mailingPanel: expanded,
+    }));
+  };
+
+  handleCloseSnackbar = () => {
+    this.setState(() => ({
+      saveMessageVisible: false,
+    }));
+  };
+
   render() {
     const { classes } = this.props;
-    const { cronJob, guzzleEditorVisible, guzzleJob } = this.state;
+    const {
+      cronJob,
+      guzzleEditorVisible,
+      rabbitMQEditorVisible,
+      guzzleJob,
+      rabbitMQJob,
+      submitting,
+      filteringPanel,
+      loggingPanel,
+      mailingPanel,
+      saveMessageVisible,
+    } = this.state;
+    const mutationJob = cronJob.id ? mutateCronJob : createCronJob;
     return (
-      <Mutation mutation={mutateCronJob}>
-        {updateCronJob => (
-          <Formik
-            initialValues={cronJob}
-            onSubmit={(values) => {
-              this.handleMutation(updateCronJob, values);
-              // MyImaginaryRestApiCall(user.id, values).then(
-              //   (updatedUser) => {
-              //     actions.setSubmitting(false);
-              //     updateUser(updatedUser);
-              //     onClose();
-              //   },
-              //   (error) => {
-              //     actions.setSubmitting(false);
-              //     actions.setErrors(transformMyRestApiErrorsToAnObject(error));
-              //     actions.setStatus({ msg: 'Set some arbitrary status or data' });
-              //   },
-              // );
-            }}
-            render={({ values, handleChange, handleSubmit }) => (
-              <React.Fragment>
-                <DialogTitle id="responsive-dialog-title">
-                  {values.id ? `Edit job: ${values.name}` : 'Create job'}
-                </DialogTitle>
-                <Tooltip
-                  title="Enable/Disable job"
-                  aria-label="Add"
-                  className={classes.enabledSwitch}
-                >
-                  <Switch value="Enabled" checked />
-                </Tooltip>
+      <React.Fragment>
+        <Mutation mutation={mutationJob}>
+          {mutation => (
+            <Formik
+              initialValues={cronJob}
+              onSubmit={(values) => {
+                this.setState(() => ({
+                  submitting: true,
+                }));
+                this.handleMutation(mutation, values);
+              }}
+              render={({ values, handleChange, handleSubmit }) => (
+                <React.Fragment>
+                  {/* <DialogTitle id="responsive-dialog-title"> */}
+                  <Typography variant="h4" gutterBottom>
+                    {values.id ? `Edit job: ${values.name}` : 'Create job'}
+                    <Typography variant="caption">
+                      <a
+                        href="https://github.com/jobbyphp/jobby"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        Read Jobby docs
+                      </a>
+                    </Typography>
+                  </Typography>
+                  {/* </DialogTitle> */}
+                  <Tooltip
+                    title="Enable/Disable job"
+                    aria-label="Add"
+                    className={classes.enabledSwitch}
+                  >
+                    <Switch value="Enabled" checked />
+                  </Tooltip>
 
-                <Button onClick={handleSubmit}>test</Button>
-                <DialogContent>
-                  <DialogContentText>
-                    <a
-                      href="https://github.com/jobbyphp/jobby"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      Read Jobby docs
-                    </a>
-                  </DialogContentText>
                   <FormControl fullWidth={true}>
                     <TextField
                       id="name"
@@ -204,12 +559,17 @@ class EditorForm extends React.Component {
                       value={values.schedule}
                       onChange={handleChange}
                     />
-                    <ExpansionPanel expanded={true} className={classes.expansion}>
-                      <ExpansionPanelDetails className={classes.marginLess}>
+                    <ExpansionPanel
+                      expanded={filteringPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleFilteringPanel}
+                      style={{ marginTop: '25px' }}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Filtering</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
                         <FormControl fullWidth={true}>
-                          <Typography variant="h6" gutterBottom>
-                            Filtering
-                          </Typography>
                           <TextField id="runAs" label="runAs" margin="normal" />
                           <FormHelperText>
                             Run as this user, if crontab user has sudo privileges
@@ -230,16 +590,34 @@ class EditorForm extends React.Component {
                           <FormHelperText>
                             Maximum execution time for this job (in seconds)
                           </FormHelperText>
-                          <Typography variant="h6" style={{ marginTop: '40px' }}>
-                            Logging
-                          </Typography>
-                          <TextField id="output" label="Output" placeholder="/dev/null" />
+                        </FormControl>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel
+                      expanded={loggingPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleLoggingPanel}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Logging</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormControl fullWidth={true}>
+                          <TextField
+                            id="output"
+                            label="Output"
+                            placeholder="/dev/null"
+                            value={values.output}
+                            onChange={handleChange}
+                          />
                           <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
                           <TextField
                             id="output_stdout"
                             label="Output stdout"
                             margin="normal"
                             placeholder="/dev/null"
+                            value={values.outputStdout}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Redirect stdout to this file</FormHelperText>
                           <TextField
@@ -247,6 +625,8 @@ class EditorForm extends React.Component {
                             label="Output stderr"
                             margin="normal"
                             placeholder="/dev/null"
+                            value={values.outputStderr}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Redirect stderr to this filee</FormHelperText>
                           <TextField
@@ -254,11 +634,23 @@ class EditorForm extends React.Component {
                             label="DateFormat"
                             margin="normal"
                             placeholder="Y-m-d H:i:s"
+                            value={values.dateFormat}
+                            onChange={handleChange}
                           />
                           <FormHelperText>Format for dates on jobby log messages</FormHelperText>
-                          <Typography variant="h6" style={{ marginTop: '40px' }}>
-                            Mailing
-                          </Typography>
+                        </FormControl>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                    <ExpansionPanel
+                      expanded={mailingPanel}
+                      className={classes.expansion}
+                      onChange={this.toggleMailingPanel}
+                    >
+                      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography variant="h6">Mailing</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <FormControl fullWidth={true}>
                           <TextField id="recipients" label="Recipients" placeholder="" />
                           <FormHelperText>Comma-separated string of email addresses</FormHelperText>
                           <TextField
@@ -331,8 +723,9 @@ class EditorForm extends React.Component {
                     <Actions
                       toggleGuzzleEditor={this.handleToggleGuzzleEditor}
                       toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
-                      jobs={cronJob.guzzleJobs.edges}
+                      cronJob={cronJob}
                       handleDeleteGuzzleJob={this.handleDeleteGuzzleJob}
+                      handleDeleteRabbitMQJob={this.handleDeleteRabbitMQJob}
                     />
                     <GuzzleEditor
                       visible={guzzleEditorVisible}
@@ -340,15 +733,47 @@ class EditorForm extends React.Component {
                       guzzleJob={guzzleJob}
                       handleGuzzleJob={this.handleGuzzleJob}
                     />
+                    <RabbitMQEditor
+                      visible={rabbitMQEditorVisible}
+                      toggleRabbitMQEditor={this.handleToggleRabbitMQEditor}
+                      rabbitMQJob={rabbitMQJob}
+                      handleRabbitMQJob={this.handleRabbitMQJob}
+                    />
                   </FormControl>
-                </DialogContent>
-              </React.Fragment>
-            )}
-          />
-        )}
-      </Mutation>
+                  <Button
+                    onClick={handleSubmit}
+                    color="primary"
+                    variant="contained"
+                    className={classes.buttonRelative}
+                    disabled={submitting}
+                    fullWidth
+                  >
+                    Save
+                    {submitting && (
+                      <CircularProgress size={24} className={classes.buttonProgress} />
+                    )}
+                  </Button>
+                </React.Fragment>
+              )}
+            />
+          )}
+        </Mutation>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={saveMessageVisible}
+          autoHideDuration={5000}
+          onClose={this.handleCloseSnackbar}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
+          message={<span id="message-id">To apply changes click save</span>}
+        />
+      </React.Fragment>
     );
   }
 }
 
-export default withStyles(styles)(EditorForm);
+export default withRouter(withStyles(styles)(EditorForm));

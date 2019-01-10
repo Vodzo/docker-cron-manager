@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { withStyles, withTheme } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import { Route, Link, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import List from '../List';
 import styles from './cronManager.style';
 
-import Fab from '../../components/fab';
 import Editor from '../Editor';
 import Cron from '../Cron/Cron';
 import Header from '../Header';
@@ -60,9 +59,6 @@ class CronManager extends React.Component {
             <Route path="/new" exact component={Cron} />
             <Route path="/edit/:id" exact component={Cron} />
           </Switch>
-          <Link to="/new">
-            <Fab />
-          </Link>
           <Editor visible={editorOpen} onClose={this.handleEditorClose} editing={editing} />
         </main>
       </React.Fragment>
