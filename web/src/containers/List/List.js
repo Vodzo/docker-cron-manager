@@ -120,9 +120,9 @@ class CronList extends React.Component {
                                         width="100%"
                                         wrapEnabled={true}
                                         theme={
-                                          localStorage.getItem('theme') === 'light'
-                                            ? 'github'
-                                            : 'solarized_dark'
+                                          localStorage.getItem('theme') === 'dark'
+                                            ? 'solarized_dark'
+                                            : 'github'
                                         }
                                         fontSize={14}
                                         showPrintMargin={false}

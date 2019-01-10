@@ -270,9 +270,7 @@ class RabbitMQEditor extends React.Component {
                       id="message"
                       mode="json"
                       width="100%"
-                      theme={
-                        localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
-                      }
+                      theme={localStorage.getItem('theme') === 'dark' ? 'solarized_dark' : 'github'}
                       name="message"
                       onChange={newValue => this.mapHandler(newValue, handleChange)}
                       fontSize={14}
