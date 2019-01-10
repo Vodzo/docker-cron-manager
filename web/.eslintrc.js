@@ -8,11 +8,11 @@ module.exports = {
         pragma: 'React', // Pragma to use, default to "React"
         version: '16.4', // React version, default to the latest React stable release
       },
-      // 'import/resolver': {
-      //   node: {
-      //     paths: ['./src'],
-      //   },
-      // },
+      'import/resolver': {
+        node: {
+          paths: ['./src'],
+        },
+      },
     },
     globals: {
       process: false,
