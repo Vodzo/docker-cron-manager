@@ -38,7 +38,6 @@ final class LogItemDataProvider implements ItemDataProviderInterface, Restricted
 
     public function getItem(string $resourceClass, $id, ?string $operationName = null, array $context = []): ?Log
     {
-        dump($context);
         $cronJobId = $id;
         $cronJob = $this->em->getRepository(CronJob::class)->findOneBy(['id' => $cronJobId]);
         $log = new Log();
