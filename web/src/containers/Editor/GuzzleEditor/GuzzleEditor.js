@@ -93,9 +93,7 @@ class GuzzleEditor extends React.Component {
                       id="options"
                       mode="json"
                       width="100%"
-                      theme={
-                        localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'
-                      }
+                      theme={localStorage.getItem('theme') === 'dark' ? 'solarized_dark' : 'github'}
                       name="options"
                       onChange={newValue => this.mapHandler(newValue, handleChange)}
                       fontSize={14}

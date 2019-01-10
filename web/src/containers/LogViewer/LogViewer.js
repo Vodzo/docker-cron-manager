@@ -49,7 +49,7 @@ class LogViewer extends React.Component {
                   mode="text"
                   width="100%"
                   wrapEnabled={true}
-                  theme={localStorage.getItem('theme') === 'light' ? 'github' : 'solarized_dark'}
+                  theme={localStorage.getItem('theme') === 'dark' ? 'solarized_dark' : 'github'}
                   fontSize={14}
                   showPrintMargin={false}
                   showGutter={true}
