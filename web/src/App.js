@@ -9,6 +9,8 @@ import 'brace/mode/json';
 import 'brace/theme/github';
 import 'brace/theme/solarized_dark';
 
+const basename = process.env.PUBLIC_URL;
+
 class App extends React.Component {
   state = {
     menuOpen: false,
@@ -66,7 +68,7 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={MuiTheme}>
         <ApolloProvider client={client}>
-          <Router>
+          <Router basename={basename}>
             <Switch>
               <Route
                 path="/"
