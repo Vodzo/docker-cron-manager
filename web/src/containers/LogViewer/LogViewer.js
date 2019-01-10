@@ -54,7 +54,7 @@ class LogViewer extends React.Component {
                   showPrintMargin={false}
                   showGutter={true}
                   highlightActiveLine={false}
-                  value={queryLogJobProps.data.log.fullLog}
+                  value={queryLogJobProps.data.log.fullLog || 'No data'}
                   setOptions={{
                     showLineNumbers: true,
                     tabSize: 2,

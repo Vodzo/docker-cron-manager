@@ -54,16 +54,18 @@ final class LogDataProvider implements CollectionDataProviderInterface, ItemData
     $cronJob = $this->em->getRepository(CronJob::class)->findOneBy(['id' => $cronJobId]);
     $log = new Log();
     $logPath = $cronJob->getOutputStdout() ? $cronJob->getOutputStdout() : $cronJob->getOutput();
-    if (!empty($context['attributes']['text'])) {
-      $text = $this->logService->tail($logPath, 10);
-      $log->setText($text);
-    }
-    if (!empty($context['attributes']['path'])) {
-      $log->setPath($logPath);
-    }
-    if (!empty($context['attributes']['fullLog'])) {
-      $fullLog = $this->logService->read($logPath);
-      $log->setFullLog($fullLog);
+    if ($logPath) {
+      if (!empty($context['attributes']['text'])) {
+        $text = $this->logService->tail($logPath, 10);
+        $log->setText($text);
+      }
+      if (!empty($context['attributes']['path'])) {
+        $log->setPath($logPath);
+      }
+      if (!empty($context['attributes']['fullLog'])) {
+        $fullLog = $this->logService->read($logPath);
+        $log->setFullLog($fullLog);
+      }
     }
     $log->setId('log_' . $cronJobId);
 
