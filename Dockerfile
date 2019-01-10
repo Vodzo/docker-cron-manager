@@ -6,7 +6,7 @@ ENV REACT_APP_GRAPHQL_ENDPOINT=/api/graphql
 RUN yarn && yarn build
 
 FROM php:7.2-fpm-alpine
-RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev sudo \
+RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev sudo ca-certificates \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install pdo imap zip mbstring bcmath opcache gd \
     && apk add autoconf \
@@ -57,8 +57,8 @@ RUN echo "*       *       *       *       *       /usr/local/bin/php -f /var/www
 COPY --from=builder /home/node/app/build/ /var/www/public/app/
 
 # symlink jobby debug to docker log
-RUN ln -sf /proc/1/fd/1 /var/www/var/log/default_jobby_out.log \
-    && ln -sf /proc/1/fd/2 /var/www/var/log/default_jobby_err.log
+# RUN ln -sf /proc/1/fd/1 /var/www/var/log/default_jobby_out.log \
+#     && ln -sf /proc/1/fd/2 /var/www/var/log/default_jobby_err.log
 
 ENV APP_ENV=prod
 ENV DATABASE_URL=sqlite:///%kernel.project_dir%/var/data.db
