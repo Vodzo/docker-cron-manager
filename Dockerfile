@@ -6,7 +6,7 @@ ENV REACT_APP_GRAPHQL_ENDPOINT=/api/graphql
 RUN yarn && yarn build
 
 FROM php:7.2-fpm-alpine
-RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev \
+RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev sudo \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install pdo imap zip mbstring bcmath opcache gd \
     && apk add autoconf \
@@ -47,6 +47,11 @@ RUN mkdir /etc/supervisor.d
 COPY docker/supervisor/webserver.conf /etc/supervisor.d/webserver.ini
 COPY docker/supervisor/webserver/php.conf  /etc/supervisor.d/webserver:php.ini
 COPY docker/supervisor/webserver/nginx.conf  /etc/supervisor.d/webserver:nginx.ini
+COPY docker/supervisor/webserver/crond.conf  /etc/supervisor.d/webserver:crond.ini
+
+# setup cronjob
+RUN ln -sf /proc/1/fd/1 /var/log/jobby.log
+RUN echo "*       *       *       *       *       /usr/local/bin/php -f /var/www/bin/console cron:run > /var/log/jobby.log 2>&1" | crontab -
 
 #copy react app
 COPY --from=builder /home/node/app/build/ /var/www/public/app/
