@@ -612,7 +612,7 @@ class EditorForm extends React.Component {
                           />
                           <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
                           <TextField
-                            id="output_stdout"
+                            id="outputStdout"
                             label="Output stdout"
                             margin="normal"
                             placeholder="/dev/null"
@@ -621,7 +621,7 @@ class EditorForm extends React.Component {
                           />
                           <FormHelperText>Redirect stdout to this file</FormHelperText>
                           <TextField
-                            id="output_stderr"
+                            id="outputStderr"
                             label="Output stderr"
                             margin="normal"
                             placeholder="/dev/null"
