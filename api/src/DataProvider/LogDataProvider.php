@@ -44,7 +44,7 @@ final class LogDataProvider implements CollectionDataProviderInterface, ItemData
   {
     $cronJobs = $this->em->getRepository(CronJob::class)->findAll();
     foreach ($cronJobs as $cronJob) {
-      yield $this->getItem($resourceClass, $cronJob->getId(), $operationName, $context);
+      yield $this->getItem($resourceClass, $cronJob->getId(), $operationName);
     }
   }
 
