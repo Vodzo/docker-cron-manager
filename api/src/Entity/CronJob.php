@@ -313,7 +313,7 @@ class CronJob
         return $this->output;
     }
 
-    public function setOutput(string $output) : self
+    public function setOutput(?string $output) : self
     {
         $this->output = $output;
 
