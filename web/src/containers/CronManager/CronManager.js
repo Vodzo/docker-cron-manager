@@ -17,6 +17,11 @@ class CronManager extends React.Component {
   static propTypes = {
     classes: PropTypes.object,
     search: PropTypes.string,
+    menuOpen: PropTypes.bool,
+    toggleMenu: PropTypes.func,
+    handleSearch: PropTypes.func,
+    handleThemeChange: PropTypes.func,
+    handleClose: PropTypes.func,
   };
 
   constructor(props) {
