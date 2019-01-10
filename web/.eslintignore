@@ -3,4 +3,4 @@ build/*
 nbproject/*
 .vscode/*
 styleguide/*
-config-overrides.js
+*config-overrides.js
