@@ -128,7 +128,7 @@ class CronList extends React.Component {
                                         showPrintMargin={false}
                                         showGutter={true}
                                         highlightActiveLine={false}
-                                        value={queryLogJobProps.data.log.text}
+                                        value={queryLogJobProps.data.log.text || 'No data'}
                                         setOptions={{
                                           showLineNumbers: true,
                                           tabSize: 2,

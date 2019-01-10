@@ -16,7 +16,7 @@ class Log
   /**
    * Full log
    *
-   * @var string
+   * @var ?string
    */
   private $fullLog;
 
@@ -31,7 +31,7 @@ class Log
   /**
    * File path
    *
-   * @var string
+   * @var ?string
    */
   private $path;
 
