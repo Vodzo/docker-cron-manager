@@ -37,7 +37,5 @@ class CronRunCommand extends Command
         $arg1 = $input->getArgument('arg1');
 
         $this->cronService->run();
-
-        $io->success('Jobby finished');
     }
 }
