@@ -35,10 +35,12 @@ class LogRotateService
    * @param string $path
    * @return void
    */
-  public function rotate(string $path) : void
+  public function rotate(?string $path) : void
   {
-    $rotate = new Rotate($path);
-    $rotate->size($this->size);
-    $rotate->run();
+    if ($path) {
+      $rotate = new Rotate($path);
+      $rotate->size($this->size);
+      $rotate->run();
+    }
   }
 }

@@ -79,19 +79,19 @@ class CronJob
     private $haltDir;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $output = "/dev/null";
+    private $output;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $output_stdout = "/dev/null";
+    private $output_stdout;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $output_stderr = "/dev/null";
+    private $output_stderr;
 
     /**
      * @ORM\Column(type="string", length=255)
