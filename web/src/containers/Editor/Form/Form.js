@@ -261,9 +261,9 @@ class EditorForm extends React.Component {
                   1}-${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
               guzzleJobs,
               rabbitMQJobs,
-              output: cronJob.output || 'var/log/default_jobby.log',
-              outputStdout: cronJob.outputStdout || 'var/log/default_jobby_out.log',
-              outputStderr: cronJob.outputStderr || 'var/log/default_jobby_err.log',
+              output: cronJob.output || null,
+              outputStdout: cronJob.outputStdout || null,
+              outputStderr: cronJob.outputStderr || null,
               dateFormat: cronJob.dateFormat || 'Y-m-d H:i:s',
             },
           },
@@ -607,7 +607,7 @@ class EditorForm extends React.Component {
                             id="output"
                             label="Output"
                             placeholder="/dev/null"
-                            value={values.output}
+                            value={values.output || ''}
                             onChange={handleChange}
                           />
                           <FormHelperText>Redirect stdout and stderr to this file</FormHelperText>
@@ -616,7 +616,7 @@ class EditorForm extends React.Component {
                             label="Output stdout"
                             margin="normal"
                             placeholder="/dev/null"
-                            value={values.outputStdout}
+                            value={values.outputStdout || ''}
                             onChange={handleChange}
                           />
                           <FormHelperText>Redirect stdout to this file</FormHelperText>
@@ -625,7 +625,7 @@ class EditorForm extends React.Component {
                             label="Output stderr"
                             margin="normal"
                             placeholder="/dev/null"
-                            value={values.outputStderr}
+                            value={values.outputStderr || ''}
                             onChange={handleChange}
                           />
                           <FormHelperText>Redirect stderr to this filee</FormHelperText>
