@@ -30,6 +30,7 @@ USER www-data
 # install app
 COPY --chown=www-data:www-data ./api/ /var/www
 RUN cd /var/www && composer install && composer clearcache \
+    && bin/console doctrine:schema:create \
     && cat /dev/null > /var/www/.env
 
 # install nginx
