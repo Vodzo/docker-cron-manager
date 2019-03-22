@@ -69,6 +69,8 @@ WORKDIR /var/www
 
 ENTRYPOINT ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
+VOLUME ["/var/www/var/data.db"]
+
 EXPOSE 80
 
 HEALTHCHECK --interval=10s --timeout=3s \
