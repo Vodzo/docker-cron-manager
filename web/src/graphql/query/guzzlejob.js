@@ -16,7 +16,9 @@ const guzzleJobFragment = gql`
 const updateGuzzleJob = gql`
   mutation guzzleJob($input: updateGuzzleJobInput) {
     updateGuzzleJob(input: $input) {
-      id
+      guzzleJob{
+        id
+      }
     }
   }
 `;
@@ -24,7 +26,9 @@ const updateGuzzleJob = gql`
 const createGuzzleJob = gql`
   mutation guzzleJob($input: createGuzzleJobInput) {
     createGuzzleJob(input: $input) {
-      id
+      guzzleJob{
+        id
+      }
     }
   }
 `;

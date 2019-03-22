@@ -56,43 +56,45 @@ const queryCronJob = gql`
 const mutateCronJob = gql`
   mutation cronJob($input: updateCronJobInput) {
     updateCronJob(input: $input) {
-      id
-      name
-      schedule
-      command
-      closure
-      runAs
-      debug
-      environment
-      runOnHost
-      maxRuntime
-      enabled
-      haltDir
-      output
-      outputStdout
-      outputStderr
-      dateFormat
-      recipients
-      mailer
-      smtpHost
-      smtpPort
-      smtpUsername
-      smtpPassword
-      smtpSecurity
-      smtpSender
-      smtpSenderName
-      timeCreated
-      timeUpdated
-      guzzleJobs {
-        edges {
-          node {
-            id
-            name
-            method
-            url
-            options
-            timeCreated
-            timeUpdated
+      cronJob {
+        id
+        name
+        schedule
+        command
+        closure
+        runAs
+        debug
+        environment
+        runOnHost
+        maxRuntime
+        enabled
+        haltDir
+        output
+        outputStdout
+        outputStderr
+        dateFormat
+        recipients
+        mailer
+        smtpHost
+        smtpPort
+        smtpUsername
+        smtpPassword
+        smtpSecurity
+        smtpSender
+        smtpSenderName
+        timeCreated
+        timeUpdated
+        guzzleJobs {
+          edges {
+            node {
+              id
+              name
+              method
+              url
+              options
+              timeCreated
+              timeUpdated
+            }
           }
         }
       }
@@ -103,9 +105,21 @@ const mutateCronJob = gql`
 const createCronJob = gql`
   mutation cronJob($input: createCronJobInput) {
     createCronJob(input: $input) {
-      id
+      cronJob {
+        id
+      }
     }
   }
 `;
 
-export { queryCronJob, mutateCronJob, createCronJob };
+const deleteCronJob = gql`
+  mutation deleteCronJob($input: deleteCronJobInput) {
+    deleteCronJob(input: $input) {
+      clientMutationId
+    }
+  }
+`;
+
+export {
+  queryCronJob, mutateCronJob, createCronJob, deleteCronJob,
+};

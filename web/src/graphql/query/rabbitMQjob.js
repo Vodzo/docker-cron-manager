@@ -35,7 +35,9 @@ const queryRabbitMQJob = null;
 const updateRabbitMQJob = gql`
   mutation rabbitMQJob($input: updateRabbitMQJobInput) {
     updateRabbitMQJob(input: $input) {
-      id
+      rabbitMQJob {
+        id
+      }
     }
   }
 `;
@@ -43,7 +45,9 @@ const updateRabbitMQJob = gql`
 const createRabbitMQJob = gql`
   mutation rabbitMQJob($input: createRabbitMQJobInput) {
     createRabbitMQJob(input: $input) {
-      id
+      rabbitMQJob {
+        id
+      }
     }
   }
 `;

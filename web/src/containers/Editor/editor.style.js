@@ -6,6 +6,11 @@ const styles = theme => ({
       backgroundColor: 'transparent',
     },
   },
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing.unit * 2,
+    right: theme.spacing.unit * 2,
+  },
   marginLess: {
     padding: '0px',
     margin: '0px',

@@ -4,10 +4,11 @@ import {
   withTheme,
   Grid,
   Typography,
-  LinearProgress,
+  CircularProgress,
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails,
+  LinearProgress,
 } from '@material-ui/core';
 import { Query } from 'react-apollo';
 import cronstrue from 'cronstrue';
@@ -59,6 +60,16 @@ class CronList extends React.Component {
     }));
   };
 
+  cronToReadable = (schedule) => {
+    let readable;
+    try {
+      readable = cronstrue.toString(schedule);
+    } catch (error) {
+      console.log(error);
+    }
+    return readable;
+  };
+
   render() {
     const { classes, search } = this.props;
     const { expanded, selectedLog } = this.state;
@@ -75,7 +86,7 @@ class CronList extends React.Component {
             <Query query={queryCronJobs} variables={{ search }} fetchPolicy="network-only">
               {({ loading, error, data }) => {
                 // if (loading) return <Loader type="line-scale-pulse-out-rapid" />;
-                if (loading) return <LinearProgress />;
+                if (loading) return <CircularProgress />;
                 if (error) return `Error! ${error.message}`;
 
                 return data.cronJobs.edges.length
@@ -91,7 +102,7 @@ class CronList extends React.Component {
                           <Typography className={classes.heading}>
                             {cronJob.node.name} -{' '}
                             {cronJob.node.schedule
-                              ? cronstrue.toString(cronJob.node.schedule)
+                              ? this.cronToReadable(cronJob.node.schedule)
                               : 'not set'}
                           </Typography>
                           <JobToggle
