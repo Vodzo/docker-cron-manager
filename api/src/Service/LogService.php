@@ -5,21 +5,8 @@ namespace App\Service;
 class LogService
 {
 
-  /**
-   * Base path
-   *
-   * @var string
-   */
-  private $basePath;
-
-  public function __construct(string $basePath)
+  public function tail(string $filepath, $lines = 1, $adaptive = true)
   {
-    $this->basePath = $basePath;
-  }
-
-  public function tail(string $path, $lines = 1, $adaptive = true)
-  {
-    $filepath = $this->basePath . '/' . $path;
     // Open file
     $f = @fopen($filepath, "rb");
     if ($f === false) return false;
@@ -61,9 +48,8 @@ class LogService
   }
 
 
-  public function read(string $path): string
+  public function read(string $filepath): string
   {
-    $filepath = $this->basePath . '/' . $path;
     // Open file
     if ($f = @fopen($filepath, "rb")) {
       return (string) fread($f, intval(filesize($filepath)));
