@@ -40,8 +40,8 @@ USER root
 RUN apk add nginx \
     && mkdir /run/nginx
 COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-RUN ln -sf /proc/1/fd/1 /var/log/nginx/access.log \
-    && ln -sf /proc/1/fd/2 /var/log/nginx/error.log
+# RUN ln -sf /proc/1/fd/1 /var/log/nginx/access.log \
+#     && ln -sf /proc/1/fd/2 /var/log/nginx/error.log
 
 # supervisor
 RUN apk add supervisor
@@ -50,6 +50,7 @@ COPY docker/supervisor/webserver.conf /etc/supervisor.d/webserver.ini
 COPY docker/supervisor/webserver/php.conf  /etc/supervisor.d/webserver:php.ini
 COPY docker/supervisor/webserver/nginx.conf  /etc/supervisor.d/webserver:nginx.ini
 COPY docker/supervisor/webserver/crond.conf  /etc/supervisor.d/webserver:crond.ini
+COPY docker/supervisor/supervisord.conf /etc/supervisord.conf
 
 # setup cronjob
 RUN ln -sf /proc/1/fd/1 /var/log/jobby.log
