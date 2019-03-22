@@ -31,7 +31,9 @@ USER www-data
 COPY --chown=www-data:www-data ./api/ /var/www
 RUN cd /var/www && composer install && composer clearcache \
     && bin/console doctrine:schema:create \
-    && cat /dev/null > /var/www/.env
+    && cat /dev/null > /var/www/.env \
+    && mkdir /var/www/var/data \
+    && mv /var/www/var/data.db /var/www/var/data/db.db
 
 # install nginx
 USER root
