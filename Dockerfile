@@ -69,8 +69,6 @@ WORKDIR /var/www
 
 ENTRYPOINT ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
 
-RUN rm /var/www/var/data.db
-
 VOLUME ["/var/www/var/data"]
 
 EXPOSE 80
