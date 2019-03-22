@@ -72,7 +72,9 @@ class CronService
         $this->jobby->run();
 
         foreach($logRotateQueue as $path) {
-            $this->logRotate->rotate($path);
+            if ($path) {
+                $this->logRotate->rotate($path);
+            }
         }
 
     }
