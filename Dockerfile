@@ -62,7 +62,6 @@ COPY --from=builder /home/node/app/build/ /var/www/public/app/
 
 ENV APP_ENV=prod
 ENV DATABASE_URL=sqlite:///%kernel.project_dir%/var/data.db
-ENV RABBITMQ_URL=amqp://guest:guest@localhost:5672
 ENV CORS_ALLOW_ORIGIN=^https?://localhost(:[0-9]+)?$
 ENV LOG_ROTATE_SIZE=12MB
 
