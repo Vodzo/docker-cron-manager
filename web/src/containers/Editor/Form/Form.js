@@ -13,9 +13,14 @@ import {
   CircularProgress,
   ExpansionPanelSummary,
   Snackbar,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogActions,
 } from '@material-ui/core';
 import _ from 'lodash';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import DeleteIcon from '@material-ui/icons/Delete';
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Mutation } from 'react-apollo';
@@ -24,7 +29,7 @@ import { withRouter } from 'react-router-dom';
 import Actions from '../Actions/index';
 import GuzzleEditor from '../GuzzleEditor/GuzzleEditor';
 import styles from '../editor.style';
-import { mutateCronJob, createCronJob } from '../../../graphql/query/cronjob';
+import { mutateCronJob, createCronJob, deleteCronJob } from '../../../graphql/query/cronjob';
 import { updateGuzzleJob, createGuzzleJob } from '../../../graphql/query/guzzlejob';
 import { createRabbitMQJob, updateRabbitMQJob } from '../../../graphql/query/rabbitMQjob';
 import client from '../../../graphql/client';
@@ -96,6 +101,8 @@ class EditorForm extends React.Component {
       loggingPanel: false,
       mailingPanel: false,
       saveMessageVisible: false,
+      deleteDialogVisible: false,
+      deleting: false,
     };
   }
 
@@ -122,7 +129,7 @@ class EditorForm extends React.Component {
               },
             })
             .then((result) => {
-              resolve(result.data.updateGuzzleJob.id);
+              resolve(result.data.updateGuzzleJob.guzzleJob.id);
             })),
         );
       } else {
@@ -143,7 +150,7 @@ class EditorForm extends React.Component {
               },
             })
             .then((result) => {
-              resolve(result.data.createGuzzleJob.id);
+              resolve(result.data.createGuzzleJob.guzzleJob.id);
             })),
         );
       }
@@ -198,7 +205,7 @@ class EditorForm extends React.Component {
               },
             })
             .then((result) => {
-              resolve(result.data.updateRabbitMQJob.id);
+              resolve(result.data.updateRabbitMQJob.rabbitMQJob.id);
             })
             .catch((error) => {
               reject(error);
@@ -220,7 +227,7 @@ class EditorForm extends React.Component {
               },
             })
             .then((result) => {
-              resolve(result.data.createRabbitMQJob.id);
+              resolve(result.data.createRabbitMQJob.rabbitMQJob.id);
             })
             .catch((error) => {
               reject(error);
@@ -492,6 +499,40 @@ class EditorForm extends React.Component {
     }));
   };
 
+  showDeleteDialog = () => {
+    this.setState(() => ({
+      deleteDialogVisible: true,
+    }));
+  };
+
+  closeDeleteDialog = () => {
+    this.setState(() => ({
+      deleteDialogVisible: false,
+    }));
+  };
+
+  handleDelete = () => {
+    const { cronJob } = this.state;
+    this.setState(() => ({
+      deleting: true,
+    }));
+    client
+      .mutate({
+        mutation: deleteCronJob,
+        variables: {
+          input: {
+            id: cronJob.id,
+          },
+        },
+      })
+      .then(() => {
+        this.setState(() => ({
+          deleting: false,
+        }));
+        this.props.history.push('/');
+      });
+  };
+
   render() {
     const { classes } = this.props;
     const {
@@ -505,6 +546,8 @@ class EditorForm extends React.Component {
       loggingPanel,
       mailingPanel,
       saveMessageVisible,
+      deleteDialogVisible,
+      deleting,
     } = this.state;
     const mutationJob = cronJob.id ? mutateCronJob : createCronJob;
     return (
@@ -521,9 +564,46 @@ class EditorForm extends React.Component {
               }}
               render={({ values, handleChange, handleSubmit }) => (
                 <React.Fragment>
+                  {values.id && (
+                    <React.Fragment>
+                      <Fab
+                        aria-label="Delete"
+                        className={classes.fab}
+                        onClick={this.showDeleteDialog}
+                      >
+                        <DeleteIcon />
+                      </Fab>
+                      <Dialog
+                        open={deleteDialogVisible}
+                        onClose={this.closeDeleteDialog}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        <DialogTitle id="alert-dialog-title">Confirm delete</DialogTitle>
+                        <DialogActions>
+                          <Button onClick={this.closeDeleteDialog} color="primary">
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={this.handleDelete}
+                            color="secondary"
+                            autoFocus
+                            variant="contained"
+                            disabled={deleting}
+                          >
+                            Delete
+                            {deleting && (
+                              <CircularProgress size={24} className={classes.buttonProgress} />
+                            )}
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </React.Fragment>
+                  )}
                   {/* <DialogTitle id="responsive-dialog-title"> */}
                   <Typography variant="h4" gutterBottom>
                     {values.id ? `Edit job: ${values.name}` : 'Create job'}
+
                     <Typography variant="caption">
                       <a
                         href="https://github.com/jobbyphp/jobby"
