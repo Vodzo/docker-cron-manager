@@ -58,9 +58,6 @@ class JobToggle extends React.Component {
         control={
           <Switch
             id="enabled"
-            classes={{
-              switchBase: classes.switch,
-            }}
             checked={cronJob.enabled}
             onChange={this.handleJobToggle}
             value={true}

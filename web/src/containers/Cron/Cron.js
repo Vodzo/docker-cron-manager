@@ -23,7 +23,7 @@ class Cron extends React.Component {
       },
     } = this.props;
     return (
-      <Grid container className={classes.root} spacing={16}>
+      <Grid container className={classes.root} spacing={1}>
         <Grid item xs={null} lg={2} />
         <Grid item xs={12} lg={8}>
           <Paper className={classes.paper}>

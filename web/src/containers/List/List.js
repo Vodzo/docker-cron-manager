@@ -75,7 +75,7 @@ class CronList extends React.Component {
     const { expanded, selectedLog } = this.state;
     return (
       <React.Fragment>
-        <Grid container className={classes.root} spacing={16}>
+        <Grid container className={classes.root} spacing={1}>
           <Grid item xs={null} lg={2} />
           <Grid item xs={12} lg={8} style={{ textAlign: 'center' }}>
             <div style={{ textAlign: 'left', marginBottom: '20px' }}>
@@ -180,4 +180,4 @@ class CronList extends React.Component {
   }
 }
 
-export default withStyles(styles)(withTheme()(CronList));
+export default withStyles(styles)(withTheme(CronList));

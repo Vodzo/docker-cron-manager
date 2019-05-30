@@ -50,4 +50,4 @@ class StyledDrawer extends React.Component {
   }
 }
 
-export default withStyles(styles)(withTheme()(StyledDrawer));
+export default withStyles(styles)(withTheme(StyledDrawer));

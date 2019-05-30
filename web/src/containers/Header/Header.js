@@ -100,4 +100,4 @@ class Header extends React.Component {
   }
 }
 
-export default withRouter(withStyles(styles)(withTheme()(Header)));
+export default withRouter(withStyles(styles)(withTheme(Header)));

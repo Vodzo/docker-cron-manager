@@ -71,4 +71,4 @@ class CronManager extends React.Component {
   }
 }
 
-export default withStyles(styles)(withTheme()(CronManager));
+export default withStyles(styles)(withTheme(CronManager));
