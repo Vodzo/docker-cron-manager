@@ -8,7 +8,7 @@ RUN yarn && yarn build
 FROM php:7.2-fpm-alpine
 RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev sudo ca-certificates \
     && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install imap zip bcmath opcache gd \
+    && docker-php-ext-install imap zip bcmath opcache gd sockets \
     && apk add autoconf \
         g++ \
         make \
