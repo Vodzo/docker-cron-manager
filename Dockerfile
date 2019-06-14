@@ -28,7 +28,7 @@ RUN rm -rf /var/www/* && chown www-data.www-data -R /var/www
 USER www-data 
 
 # setup php.ini overrides
-COPY services/configs/php/ /usr/local/etc/php/conf.d/
+COPY docker/php/ /usr/local/etc/php/conf.d/
 
 # install app
 COPY --chown=www-data:www-data ./api/ /var/www
