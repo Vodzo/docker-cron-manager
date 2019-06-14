@@ -25,7 +25,10 @@ RUN apk add imap-dev openldap-dev krb5-dev zlib-dev wget git fcgi libpng-dev sud
     && ln -sf /proc/1/fd/2 /var/log/php7.2-fpm.error.log
 # change to www-data user
 RUN rm -rf /var/www/* && chown www-data.www-data -R /var/www
-USER www-data    
+USER www-data 
+
+# setup php.ini overrides
+COPY services/configs/php/ /usr/local/etc/php/conf.d/
 
 # install app
 COPY --chown=www-data:www-data ./api/ /var/www
@@ -67,6 +70,7 @@ ENV APP_ENV=prod
 ENV DATABASE_URL=sqlite:///%kernel.project_dir%/var/data/db.db
 ENV CORS_ALLOW_ORIGIN=^https?://localhost(:[0-9]+)?$
 ENV LOG_ROTATE_SIZE=12MB
+ENV DATE_TIMEZONE=UTC
 
 WORKDIR /var/www
 
