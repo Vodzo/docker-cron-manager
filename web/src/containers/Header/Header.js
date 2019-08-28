@@ -26,7 +26,7 @@ import styles from './header.style';
 
 class Header extends React.Component {
   static propTypes = {
-    theme: PropTypes.object,
+    theme: PropTypes.string,
     classes: PropTypes.object,
     onMenuIconClick: PropTypes.func,
     onSearch: PropTypes.func,
@@ -81,7 +81,7 @@ class Header extends React.Component {
           </div>
           <div className={classes.grow} />
           <IconButton color="inherit" aria-label="Menu" onClick={this.handleThemeChange}>
-            {theme === 'light' ? <WbIncandescentOutlined /> : <WbIncandescent />}
+            {theme === 'light' ? <WbIncandescent /> : <WbIncandescentOutlined />}
           </IconButton>
           <Tooltip title="Docs" aria-label="Docs">
             <Button
