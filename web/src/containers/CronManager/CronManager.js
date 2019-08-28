@@ -15,6 +15,7 @@ import Drawer from '../Drawer';
 
 class CronManager extends React.Component {
   static propTypes = {
+    theme: PropTypes.string,
     classes: PropTypes.object,
     search: PropTypes.string,
     menuOpen: PropTypes.bool,
@@ -46,12 +47,13 @@ class CronManager extends React.Component {
   };
 
   render() {
-    const { classes, search, menuOpen } = this.props;
+    const { theme, classes, search, menuOpen } = this.props;
     const { editorOpen, editing } = this.state;
     return (
       <React.Fragment>
         <CssBaseline />
         <Header
+          theme={theme}
           onMenuIconClick={this.props.toggleMenu}
           onSearch={this.props.handleSearch}
           onThemeChange={this.props.handleThemeChange}
